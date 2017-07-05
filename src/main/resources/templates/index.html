@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+
+<body>
+ <form method="post">
+     <h4>演示版本，提交后大约等待30秒。不要重复提交！</h4>
+   <input type="text" name="username" value="wmxfz182293" />
+   <input type="password" name="password" value="liang123" />
+     <input type="submit" value="提交" />
+ </form>
+<#if orders?exists>
+   <#list orders as item>
+    <div>
+      <h2>${item_index?if_exists+1}</h2>
+      <pre>
+        ${item}
+      </pre>
+    </div>
+   </#list>
+ </#if>
+
+
+</body>
+
+</html>
