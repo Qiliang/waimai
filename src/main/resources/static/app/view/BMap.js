@@ -58,7 +58,7 @@ Ext.define('Kits.view.BMap', {
         }
         var o =  new google.maps.Marker(marker);
         Ext.Object.each(marker.listeners, function(name, fn){
-            google.maps.event.addListener(o, name, fn);
+            google.maps.event.addListener(o, name, fn);//测试111
         });
         return o;
     },
