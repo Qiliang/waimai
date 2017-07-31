@@ -5,7 +5,7 @@ Ext.define('Kits.view.Order', {
     columns: [
         {text: 'id', dataIndex: 'id'},
         {text: '描述', dataIndex: 'description'},
-        {text: '时间', dataIndex: 'time'},
+        {text: '时间', dataIndex: 'time', xtype: 'datecolumn', format: 'Y-m-d h:i:s'},
         {text: '状态', dataIndex: 'state'},
         {text: '客户', dataIndex: 'userName'},
         {text: '地址', dataIndex: 'userAddress'},

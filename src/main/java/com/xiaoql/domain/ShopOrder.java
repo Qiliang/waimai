@@ -10,7 +10,11 @@ public class ShopOrder {
     @Id
     private String id;
 
-    private String ShopId;
+    private String shopId;
+
+    private String shopName;
+
+    private String shopAddress;
 
     private Date time;
 
@@ -33,12 +37,28 @@ public class ShopOrder {
     private String riderId;
     private String description;
 
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
     public String getShopId() {
-        return ShopId;
+        return shopId;
     }
 
     public void setShopId(String shopId) {
-        ShopId = shopId;
+        this.shopId = shopId;
+    }
+
+    public String getShopAddress() {
+        return shopAddress;
+    }
+
+    public void setShopAddress(String shopAddress) {
+        this.shopAddress = shopAddress;
     }
 
     public String getDescription() {

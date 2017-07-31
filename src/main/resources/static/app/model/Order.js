@@ -2,7 +2,7 @@ Ext.define('Kits.model.Order', {
     extend: 'Ext.data.Model',
     fields: [
         {name: 'id', type: 'string'},
-        {name: 'time', type: 'string'},
+        {name: 'time', type: 'date',dateFormat:'timestamp'},
         {name: 'description', type: 'string'},
         {name: 'stime', type: 'string',},
         {name: 'state', type: 'string'},

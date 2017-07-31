@@ -73,7 +73,7 @@ public class Index {
             shop.setId(Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes()));
             shop.setMeituanId(driver.findElementByCssSelector("a.shop-link").getAttribute("href"));
             shop.setName(driver.findElementByCssSelector("h4.poi-name").getText());
-            shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText());
+            shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText().split("：")[1]);
             shop.setPhone(driver.findElementByCssSelector("span.telephone-show").getText());
             shop.setLoginName(username);
             shop.setLoginPassword(password);
@@ -97,8 +97,9 @@ public class Index {
                     order.setShopId(shop.getId());
                     order.setId(li.getAttribute("id"));
                     order.setTime(orderTime);
-
-                    order.setRemark(remark(driver, li));
+                    order.setShopAddress(shop.getAddress());
+                    order.setShopName(shop.getName());
+//                    order.setRemark(remark(driver, li));
                     order.setUserName(li.findElement(By.cssSelector("div.user-name")).getText());
                     order.setState(li.findElement(By.cssSelector("div.order-state")).getText());
                     order.setUserPhone(phone(driver, li));
@@ -148,7 +149,7 @@ public class Index {
         if (we.getAttribute("data-original-title") != null) {
             return we.getAttribute("data-original-title");
         } else {
-            return li.getText();
+            return we.getText();
         }
     }
 
