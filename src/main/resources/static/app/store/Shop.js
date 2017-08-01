@@ -5,6 +5,6 @@ Ext.define('Kits.store.Shop', {
         type: 'rest',
         url: '/meituan/shops'
     },
-    autoLoad: true
-
+    autoLoad: true,
+    autoSync: true
 });

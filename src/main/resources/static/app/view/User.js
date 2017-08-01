@@ -2,16 +2,24 @@ Ext.define('Kits.view.User', {
     extend: 'Ext.grid.Panel',
     title: '系统用户',
     store: Ext.create('Kits.store.User'),
-    selModel: {
-        type: 'cellmodel'
-    },
-    plugins: {
-        ptype: 'cellediting',
-        clicksToEdit: 2
-    },
+    plugins: [{
+        ptype: 'rowediting',
+        clicksToMoveEditor: 1,
+        autoCancel: false
+    }],
 
+    tools: [
+        {
+            type: 'refresh',
+            tooltip: '刷新',
+            callback: function (panel, tool, event) {
+                panel.getStore().load();
+            }
+        }
+    ],
     tbar: [{
-        text: '新增用户',
+        iconCls: 'x-fa fa-plus',
+        text: '用户',
         handler: function () {
             var me = this.up('grid');
             var rec = Ext.create('Kits.model.User', {
@@ -77,7 +85,7 @@ Ext.define('Kits.view.User', {
             sortable: false,
             menuDisabled: true,
             items: [{
-                iconCls: 'x-fa fa-ban',
+                iconCls: 'actionColumnRed x-fa fa-ban',
                 tooltip: '删除',
                 style: {
                     width: '95%',

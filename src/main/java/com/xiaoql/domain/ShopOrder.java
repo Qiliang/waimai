@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
-public class ShopOrder {
+public class ShopOrder extends JPAEntity {
 
     @Id
     private String id;
@@ -35,7 +35,35 @@ public class ShopOrder {
     private String orderLng;
     private String orderLat;
     private String riderId;
+    private Date riderAssignTime;//订单分配给骑手的时间
+    private Date riderGetGoodsTime;//骑手拿到货品的时间
+    private Date riderToUserTime;//骑手送达给客户的时间
     private String description;
+
+
+    public Date getRiderAssignTime() {
+        return riderAssignTime;
+    }
+
+    public void setRiderAssignTime(Date riderAssignTime) {
+        this.riderAssignTime = riderAssignTime;
+    }
+
+    public Date getRiderGetGoodsTime() {
+        return riderGetGoodsTime;
+    }
+
+    public void setRiderGetGoodsTime(Date riderGetGoodsTime) {
+        this.riderGetGoodsTime = riderGetGoodsTime;
+    }
+
+    public Date getRiderToUserTime() {
+        return riderToUserTime;
+    }
+
+    public void setRiderToUserTime(Date riderToUserTime) {
+        this.riderToUserTime = riderToUserTime;
+    }
 
     public String getShopName() {
         return shopName;

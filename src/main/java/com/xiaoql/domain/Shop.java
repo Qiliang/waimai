@@ -7,7 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class Shop {
+public class Shop extends JPAEntity {
 
     @Id
     private String id;

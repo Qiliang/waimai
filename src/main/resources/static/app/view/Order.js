@@ -2,6 +2,17 @@ Ext.define('Kits.view.Order', {
     extend: 'Ext.grid.Panel',
     title: '订单',
     store: Ext.create('Kits.store.Order'),
+
+    tools: [
+        {
+            type: 'refresh',
+            tooltip: '刷新',
+            callback: function (panel, tool, event) {
+                panel.getStore().load();
+            }
+        }
+    ],
+
     columns: [
         {text: 'id', dataIndex: 'id'},
         {text: '描述', dataIndex: 'description'},
@@ -14,6 +25,6 @@ Ext.define('Kits.view.Order', {
         {text: '店铺经度', dataIndex: 'shopLng'},
         {text: '店铺纬度', dataIndex: 'shopLat'},
         {text: '用户经度', dataIndex: 'orderLng'},
-        {text: '用户纬度', dataIndex: 'orderLat'},
+        {text: '用户纬度', dataIndex: 'orderLat'}
     ]
 });

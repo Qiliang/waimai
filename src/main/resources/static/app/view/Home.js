@@ -1,19 +1,54 @@
 Ext.define('Kits.view.Home', {
-    extend: 'Ext.grid.Panel',
+    extend: 'Ext.panel.Panel',
     title: '首页',
-    store: Ext.create('Kits.store.Order'),
-    columns: [
-        {text: 'id', dataIndex: 'id'},
-        {text: '描述', dataIndex: 'description'},
-        {text: '时间', dataIndex: 'time'},
-        {text: '状态', dataIndex: 'state'},
-        {text: '客户', dataIndex: 'userName'},
-        {text: '地址', dataIndex: 'userAddress'},
-        {text: '电话', dataIndex: 'userPhone'},
-        {text: '备注', dataIndex: 'remark'},
-        {text: '店铺经度', dataIndex: 'shopLng'},
-        {text: '店铺纬度', dataIndex: 'shopLat'},
-        {text: '用户经度', dataIndex: 'orderLng'},
-        {text: '用户纬度', dataIndex: 'orderLat'},
+    layout: {
+        type: 'vbox',
+        align: 'stretch'
+    },
+    items: [
+        {
+            xtype: 'panel',
+            // title: '1111',
+            flex: 2,
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+            items: [
+                {html: '店铺', flex: 1, border: true, frame: true},
+                {html: '订单', flex: 1, border: true, frame: true},
+                {html: '骑手', flex: 1, border: true, frame: true}
+            ]
+        },
+        {
+            xtype: 'panel',
+            flex: 1,
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+            items: [
+                {html: '接单量', flex: 1, border: true, frame: true},
+                {html: '完成单量', flex: 1, border: true, frame: true},
+                {html: '异常取消单量', flex: 1, border: true, frame: true},
+                {html: '超时单量', flex: 1, border: true, frame: true},
+                {html: '平均配送时长', flex: 1, border: true, frame: true},
+                {html: '活跃骑手', flex: 1, border: true, frame: true}
+            ]
+        },
+        {
+            xtype: 'panel',
+            // title: '1111',
+            flex: 3,
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+            items: [
+                {html: '111222', flex: 1, border: true, frame: true},
+                {html: '111222', flex: 1, border: true, frame: true},
+                {html: '111222', flex: 1, border: true, frame: true},
+            ]
+        }
     ]
 });

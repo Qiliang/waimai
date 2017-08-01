@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 @Entity
-public class User {
+public class User extends JPAEntity {
 
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_SCHEDULE = "SCHEDULE";
@@ -72,14 +72,5 @@ public class User {
     }
 
 
-    public void update(Map<String, Object> from) {
-        from.keySet().forEach(key -> {
-            Field field = FieldUtils.getField(User.class, key, true);
-            try {
-                FieldUtils.writeField(field, this, from.get(key), true);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
-    }
+
 }

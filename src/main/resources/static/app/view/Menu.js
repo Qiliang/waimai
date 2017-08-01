@@ -2,6 +2,7 @@ Ext.define('Kits.view.Menu', {
     extend: 'Ext.list.Tree',
     rootVisible: false,
     useArrows: true,
+    id: 'mainMenu',
     listeners: {
         selectionchange: function (me, selected, eOpts) {
             var center = Ext.getCmp('center');
@@ -60,8 +61,31 @@ Ext.define('Kits.view.Menu', {
                 {
                     iconCls: 'x-fa fa-map',
                     text: '调度管理',
-                    cmp: 'Kits.view.Schedule',
-                    leaf: true
+
+                    children: [
+                        {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '待指派',
+                            cmp: 'Kits.view.schedule.Dzp'
+                        },
+                        {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '配送中',
+                            cmp: 'Kits.view.schedule.Psz'
+                        }, {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '异常订单',
+                            cmp: 'Kits.view.schedule.Yc'
+                        }, {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '完成订单',
+                            cmp: 'Kits.view.schedule.Wc'
+                        }
+                    ]
                 },
                 {
                     iconCls: 'x-fa fa-bicycle',

@@ -5,18 +5,36 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
-public class Rider {
+public class Rider extends JPAEntity {
 
     @Id
     private String id;
     private String name;
+    private String phone;
     private String loginName;
     private String loginPassword;
     private String lng;
     private String lat;
+    private Date lastModifyTime;
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getLastModifyTime() {
+        return lastModifyTime;
+    }
+
+    public void setLastModifyTime(Date lastModifyTime) {
+        this.lastModifyTime = lastModifyTime;
+    }
 
     public String getId() {
         return id;
