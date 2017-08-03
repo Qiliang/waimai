@@ -1,6 +1,7 @@
 package com.xiaoql.web;
 
-import com.xiaoql.domain.OrderRepository;
+import com.xiaoql.SpringApplicationContextHolder;
+import com.xiaoql.domain.ShopOrderRepository;
 import com.xiaoql.domain.Shop;
 import com.xiaoql.domain.ShopOrder;
 import com.xiaoql.domain.ShopRepository;
@@ -15,27 +16,32 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Base64;
+import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Controller
-public class Index {
+@RestController
+@RequestMapping("/meituan/spider")
+public class MeitunSpider {
 
     @Value("${phantomjs.path}")
     private String phantomjsPath;
 
     @Autowired
-    private OrderRepository orderRepository;
+    private SpringApplicationContextHolder springApplicationContextHolder;
+
+    @Autowired
+    private ExecutorService executorService;
+
+    @Autowired
+    private ShopOrderRepository shopOrderRepository;
 
     @Autowired
     private ShopRepository shopRepository;
@@ -55,28 +61,38 @@ public class Index {
         return driver;
     }
 
-    @PostMapping({"/", ""})
-    public String get(@RequestParam String username, @RequestParam String password, Model model) {
+    @PostMapping({"/{id}"})
+    public Object get(@PathVariable String id) {
+        //executorService.execute(() -> orderSpider(id));
+        return new RestResponse();
+    }
+
+    @Scheduled(initialDelay = 10000, fixedDelay = 10 * 60 * 1000)
+    @Transactional
+    public void orderSpider() {
+        String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
+//        final ShopRepository shopRepository = SpringApplicationContextHolder.bean(ShopRepository.class);
+//        final ShopOrderRepository shopOrderRepository = SpringApplicationContextHolder.bean(ShopOrderRepository.class);
+        Shop shop = shopRepository.getOne(id);
+        if (shop.isStealing()) return;
+        shop.setStealing(true);
+        shopRepository.save(shop);
         PhantomJSDriver driver = getPhantomJs();
         try {
             driver.get("http://e.waimai.meituan.com/logon");
             System.out.println(driver.getTitle());
             driver.switchTo().frame("J-logon-iframe");
-            driver.findElementByCssSelector("input.login__login").sendKeys("wmxfz182293");
-            driver.findElementByCssSelector("input.login__password").sendKeys("liang123");
+            driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+            driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
             driver.findElementByCssSelector(".login__submit").click();
             sleep(3000);
 
             driver.get("http://e.waimai.meituan.com/#/v2/shop/manage/shopInfo");
             driver.switchTo().frame("hashframe");
-            Shop shop = new Shop();
-            shop.setId(Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes()));
             shop.setMeituanId(driver.findElementByCssSelector("a.shop-link").getAttribute("href"));
             shop.setName(driver.findElementByCssSelector("h4.poi-name").getText());
             shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText().split("：")[1]);
             shop.setPhone(driver.findElementByCssSelector("span.telephone-show").getText());
-            shop.setLoginName(username);
-            shop.setLoginPassword(password);
             shopRepository.save(shop);
 
             driver.switchTo().defaultContent();
@@ -84,7 +100,7 @@ public class Index {
             driver.switchTo().frame("hashframe");
 
             WebElement btnNext = null;
-            List<String> orders = new ArrayList<>();
+            //List<String> orders = new ArrayList<>();
             do {
 //<i class="j-show-map fa fa-map-marker" data-addr="机电小区 (三江桥北门外正街23*****" data-poi-lat="30713350" data-poi-lng="111285591" data-order-lat="30714533" data-order-lng="111284602"> &lt;1km</i>
                 btnNext = driver.findElementByCssSelector("button.J-next-page");
@@ -92,7 +108,7 @@ public class Index {
                 orderContent.findElements(By.cssSelector("li.order-list-item")).forEach(li -> {
                     //System.out.println(li.getText());
                     Date orderTime = new Date();
-                    orderTime.setTime(Long.valueOf(li.getAttribute("data-order-time")));
+                    orderTime.setTime(Long.valueOf(li.getAttribute("data-order-time")) * 1000);
                     ShopOrder order = new ShopOrder();
                     order.setShopId(shop.getId());
                     order.setId(li.getAttribute("id"));
@@ -113,19 +129,18 @@ public class Index {
                     //drop-con
                     //j-show-map fa fa-map-marker
 
-                    orderRepository.save(order);
-                    orders.add(li.getText());
+                    shopOrderRepository.save(order);
                 });
                 btnNext.click();
             }
             while (btnNext.isEnabled());
 
-            model.addAttribute("orders", orders);
-            return "index";
         } catch (Exception e) {
             throw e;
         } finally {
             driver.quit();
+            shop.setStealing(false);
+            shopRepository.save(shop);
         }
     }
 
@@ -151,11 +166,6 @@ public class Index {
         } else {
             return we.getText();
         }
-    }
-
-    @GetMapping({"", "/"})
-    public String index(HttpServletResponse response) {
-        return "index";
     }
 
     private void sleep(int time) {

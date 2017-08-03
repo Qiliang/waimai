@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
-public class ShopOrder extends JPAEntity {
+public class RiderOrder extends JPAEntity {
 
     @Id
     private String id;

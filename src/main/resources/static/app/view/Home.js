@@ -40,15 +40,50 @@ Ext.define('Kits.view.Home', {
             xtype: 'panel',
             // title: '1111',
             flex: 3,
-            layout: {
-                type: 'hbox',
-                align: 'stretch'
-            },
-            items: [
-                {html: '111222', flex: 1, border: true, frame: true},
-                {html: '111222', flex: 1, border: true, frame: true},
-                {html: '111222', flex: 1, border: true, frame: true},
-            ]
+            layout: 'fit',
+            items: {
+                xtype: 'cartesian',
+                store:Ext.create('Kits.store.DailyOrder'),
+                insetPadding: {
+                    top: 40,
+                    bottom: 40,
+                    left: 20,
+                    right: 40
+                },
+                axes: [{
+                    type: 'numeric',
+                    position: 'left',
+                    minimum: 30,
+                    titleMargin: 20,
+                    title: {
+                        text: 'Temperature in °F'
+                    }
+                }, {
+                    type: 'category',
+                    position: 'bottom'
+                }],
+                animation: Ext.isIE8 ? false : true,
+                series: {
+                    type: 'bar',
+                    xField: 'month',
+                    yField: 'highF',
+                    style: {
+                        minGapWidth: 20
+                    },
+                    highlight: {
+                        strokeStyle: 'black',
+                        fillStyle: 'gold'
+                    },
+                    label: {
+                        field: 'highF',
+                        display: 'insideEnd',
+                        renderer: 'onSeriesLabelRender'
+                    }
+                },
+                listeners: {
+                   // afterrender: 'onAfterRender',
+                }
+            }
         }
     ]
 });

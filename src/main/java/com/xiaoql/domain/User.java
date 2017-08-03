@@ -1,13 +1,11 @@
 package com.xiaoql.domain;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.lang.reflect.Field;
-import java.util.Map;
+import java.util.Date;
 
 @Entity
 public class User extends JPAEntity {
@@ -22,6 +20,28 @@ public class User extends JPAEntity {
     private String loginPassword;
     private String role;
     private boolean alive;
+
+    @CreatedDate
+    private Date createdDate;
+
+    @LastModifiedDate
+    private Date lastModifiedDate;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     public String getId() {
         return id;

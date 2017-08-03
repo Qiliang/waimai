@@ -42,6 +42,11 @@ Ext.define('Kits.view.Shop', {
             }
         },
         {
+            flex:1,
+            text: '爬取状态',
+            dataIndex: 'stealing'
+        },
+        {
             flex:2,
             text: '地址',
             dataIndex: 'address',
@@ -82,19 +87,39 @@ Ext.define('Kits.view.Shop', {
 
             sortable: false,
             menuDisabled: true,
-            items: [{
-                iconCls: 'actionColumnRed x-fa fa-ban',
-                tooltip: '删除',
-                style: {
-                    color: 'red',
-                    marginBottom: '10px'
+            items: [
+                {
+                    iconCls: 'actionColumnRed x-fa fa-ban',
+                    tooltip: '删除',
+                    handler: function (view, recIndex, cellIndex, item, e, record) {
+                        Ext.Msg.confirm('确认', '确认删除?', function (r) {
+                            if (r == 'yes') record.drop();
+                        }, this);
+                    }
                 },
-                handler: function (view, recIndex, cellIndex, item, e, record) {
-                    Ext.Msg.confirm('确认', '确认删除?', function (r) {
-                        if (r == 'yes') record.drop();
-                    }, this);
+                {
+                    iconCls: 'actionColumnRed x-fa fa-ban',
+                    tooltip: '爬取',
+                    handler: function (view, recIndex, cellIndex, item, e, record) {
+                        Ext.Msg.confirm('确认', '确认爬取?', function (r) {
+                            if (r != 'yes')return;
+                            Ext.Ajax.request({
+                                method: 'POST',
+                                url: '/meituan/spider/' + record.get('id'),
+
+                                success: function (response, opts) {
+                                    var obj = Ext.decode(response.responseText);
+                                    console.dir(obj);
+                                },
+
+                                failure: function (response, opts) {
+                                    console.log('server-side failure with status code ' + response.status);
+                                }
+                            });
+                        }, this);
+                    }
                 }
-            }]
+            ]
         }
     ]
 });

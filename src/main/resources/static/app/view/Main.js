@@ -10,7 +10,7 @@ Ext.define('Kits.view.Main', {
 
     defaults: {
         collapsible: false,
-        split: false,
+        split: true,
         bodyPadding: 10
     },
     listeners: {
@@ -24,15 +24,14 @@ Ext.define('Kits.view.Main', {
 
     items: [
         {
-            width: 250,
-            split: true,
+            width: 200,
             layout: {
                 type: 'vbox',
                 align: 'stretch'
             },
             border: false,
             scrollable: 'y',
-            title: '菜单',
+            title: '',
             region: 'west',
             colspan: 2,
             items: Ext.create('Kits.view.Menu', {}),
@@ -43,7 +42,11 @@ Ext.define('Kits.view.Main', {
                     tooltip: '收起菜单',
                     callback: function (panel, tool, event) {
                         panel.down('#menuPin').show();
-                        panel.down('#mainMenu').setMicro(true)
+                        var menu = panel.down('#mainMenu');
+                        menu.setMicro(true);
+                        var ct = menu.ownerCt;
+                        ct.oldWidth = ct.width;
+                        ct.setWidth(44);
                         this.hide();
                     }
                 },
@@ -54,7 +57,10 @@ Ext.define('Kits.view.Main', {
                     tooltip: '展开菜单',
                     callback: function (panel, tool, event) {
                         panel.down('#menuUnpin').show();
-                        panel.down('#mainMenu').setMicro(true)
+                        var menu = panel.down('#mainMenu');
+                        menu.setMicro(false);
+                        var ct = menu.ownerCt;
+                        if(ct.oldWidth)ct.setWidth(ct.oldWidth);
                         this.hide();
                     }
                 }

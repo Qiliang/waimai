@@ -1,8 +1,8 @@
 package com.xiaoql.web;
 
-import com.xiaoql.domain.OrderRepository;
 import com.xiaoql.domain.Shop;
 import com.xiaoql.domain.ShopOrder;
+import com.xiaoql.domain.ShopOrderRepository;
 import com.xiaoql.domain.ShopRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 public class MeituanController {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private ShopOrderRepository shopOrderRepository;
 
     @Autowired
     private ShopRepository shopRepository;
@@ -60,21 +61,46 @@ public class MeituanController {
     }
 
 
+    @GetMapping({"/dailyOrders"})
+    public List<ShopOrder> dailyOrders() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return shopOrderRepository.findByTimeAfter(today.getTime());
+    }
+
     @GetMapping({"/orders"})
     public List<ShopOrder> orders() {
-        return orderRepository.findAll();
+        return shopOrderRepository.findAll();
     }
 
     @PutMapping({"/orders/{id}"})
     public void orders(@PathVariable String id, @RequestBody Map<String, Object> toOrder, HttpServletResponse response) {
-        ShopOrder shopOrder = orderRepository.getOne(id);
+        ShopOrder shopOrder = shopOrderRepository.getOne(id);
         if (shopOrder == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
         shopOrder.update(toOrder);
-        orderRepository.save(shopOrder);
+        shopOrderRepository.save(shopOrder);
     }
+
+
+    @PostMapping({"/orders/{id}/asign/{riderId}"})
+    public void orderAsignRider(@PathVariable String id, @PathVariable String riderId, HttpServletResponse response) {
+        ShopOrder shopOrder = shopOrderRepository.getOne(id);
+        if (shopOrder == null) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        shopOrder.setRiderId(riderId);
+        shopOrderRepository.save(shopOrder);
+    }
+
+
 
 
 

@@ -1,9 +1,6 @@
 package com.xiaoql.web;
 
-import com.xiaoql.domain.Rider;
-import com.xiaoql.domain.RiderRepository;
-import com.xiaoql.domain.User;
-import com.xiaoql.domain.UserRepository;
+import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +17,9 @@ public class ApiController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ShopOrderRepository shopOrderRepository;
 
     @Autowired
     private RiderRepository riderRepository;
@@ -76,6 +76,12 @@ public class ApiController {
         Rider rider = riderRepository.getOne(id);
         rider.update(modifier);
         riderRepository.save(rider);
+    }
+
+    @GetMapping("/riders/{id}/orders/count")
+    public long riders(@PathVariable String id, HttpServletResponse response) {
+        long count = shopOrderRepository.count((root, query, builder) -> builder.equal(root.get("riderId"), id));
+        return count;
     }
 
     @PostMapping("/riders")

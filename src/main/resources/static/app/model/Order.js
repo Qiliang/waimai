@@ -2,7 +2,10 @@ Ext.define('Kits.model.Order', {
     extend: 'Ext.data.Model',
     fields: [
         {name: 'id', type: 'string'},
-        {name: 'time', type: 'date',dateFormat:'timestamp'},
+        {name: 'shopId', type: 'string'},
+        {name: 'shopName', type: 'string'},
+        {name: 'shopAddress', type: 'string'},
+        {name: 'time', type: 'date',dateFormat:'time'},
         {name: 'description', type: 'string'},
         {name: 'stime', type: 'string',},
         {name: 'state', type: 'string'},
@@ -14,5 +17,10 @@ Ext.define('Kits.model.Order', {
         {name: 'shopLat', type: 'string'},
         {name: 'orderLng', type: 'string'},
         {name: 'orderLat', type: 'string'},
+        {name: 'riderId', type: 'string'},
+        {name: 'riderAssignTime', type: 'date', dateFormat: 'time'},
+        {name: 'riderGetGoodsTime', type: 'date', dateFormat: 'time'},
+        {name: 'riderToUserTime', type: 'date', dateFormat: 'time'},
+        {name: 'description', type: 'string'}
     ]
 })

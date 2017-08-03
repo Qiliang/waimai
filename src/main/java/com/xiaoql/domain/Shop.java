@@ -1,12 +1,15 @@
 package com.xiaoql.domain;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
+@Lazy(value = false)
 public class Shop extends JPAEntity {
 
     @Id
@@ -23,6 +26,36 @@ public class Shop extends JPAEntity {
     private String loginName;
     private String loginPassword;
 
+    private boolean stealing;
+    @CreatedDate
+    private Date createdDate;
+
+    @LastModifiedDate
+    private Date lastModifiedDate;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public boolean isStealing() {
+        return stealing;
+    }
+
+    public void setStealing(boolean stealing) {
+        this.stealing = stealing;
+    }
 
     public String getMeituanId() {
         return meituanId;

@@ -3,6 +3,7 @@ Ext.define('Kits.view.Menu', {
     rootVisible: false,
     useArrows: true,
     id: 'mainMenu',
+    ui:'nav',
     listeners: {
         selectionchange: function (me, selected, eOpts) {
             var center = Ext.getCmp('center');

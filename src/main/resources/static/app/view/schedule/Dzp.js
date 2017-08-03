@@ -1,5 +1,6 @@
 Ext.define('Kits.view.schedule.Dzp', {
     extend: 'Ext.panel.Panel',
+    alias: 'widget.dzp',
     title: '调度--待指派',
     store: Ext.create('Kits.store.User'),
     layout: {
@@ -11,7 +12,8 @@ Ext.define('Kits.view.schedule.Dzp', {
     items: [
         {
             xtype: 'grid',
-            store: Ext.create('Kits.store.Shop'),
+            itemId: 'shopOrderGrid',
+            store: Ext.create('Kits.store.Order'),
             tbar: [
                 {
                     xtype: 'combo',
@@ -23,19 +25,42 @@ Ext.define('Kits.view.schedule.Dzp', {
                 }
             ],
             columns: [
-                {text: '商家名称', dataIndex: 'name', flex: 1}
+                {text: '商家名称', dataIndex: 'userAddress', flex: 1}
             ],
             width: 200,
             listeners: {
                 selectionchange: function (grid, selected, eOpts) {
                     var rec = selected[0];
-
-
+                    var bMap = this.up('panel').down('bmap');
+                    bMap.markerOrderClear();
+                    bMap.markerOrder(rec);
                 }
             }
         },
         {
             xtype: 'bmap',
+            asignToRider: function (riderId) {
+                var me = this.up('dzp');
+                var grid = me.down('grid[itemId=shopOrderGrid]');
+                if (!grid.getSelection() || grid.getSelection().length == 0)return;
+                var orderRecord = grid.getSelection()[0];
+                Ext.Msg.confirm('确认', '确认指派?', function (r) {
+                    if (r !== 'yes') return;
+                    Ext.Ajax.request({
+                        method: 'POST',
+                        url: '/meituan/orders/' + orderRecord.get('id') + '/asign/' + riderId,
+
+                        success: function (response, opts) {
+                            var obj = Ext.decode(response.responseText);
+                            console.dir(obj);
+                        },
+
+                        failure: function (response, opts) {
+                            console.log('server-side failure with status code ' + response.status);
+                        }
+                    });
+                }, this);
+            },
             flex: 1
         },
         {
@@ -78,5 +103,7 @@ Ext.define('Kits.view.schedule.Dzp', {
 
     afterComponentLayout: function (w, h) {
         this.callParent(arguments);
-    },
+    }
+
+
 });
