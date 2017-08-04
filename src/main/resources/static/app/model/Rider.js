@@ -10,6 +10,12 @@ Ext.define('Kits.model.Rider', {
         {name: 'lng', type: 'string'},
         {name: 'lat', type: 'string'},
         {name: 'lastModifyTime', type: 'date',dateFormat:'timestamp'},
+        {
+            name: 'displayName', type: 'string', persist: false,
+            mapping: function (data) {
+                return data.phone + ':' + data.name;
+            }
+        }
     ]
 
 })

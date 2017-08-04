@@ -13,7 +13,12 @@ Ext.define('Kits.view.schedule.Dzp', {
         {
             xtype: 'grid',
             itemId: 'shopOrderGrid',
-            store: Ext.create('Kits.store.Order'),
+            store: Ext.create('Kits.store.Order', {
+                proxy: {
+                    type: 'ajax',
+                    url: '/meituan/orders?state=dzp'
+                }
+            }),
             tbar: [
                 {
                     xtype: 'combo',
@@ -39,22 +44,25 @@ Ext.define('Kits.view.schedule.Dzp', {
         },
         {
             xtype: 'bmap',
-            asignToRider: function (riderId) {
+            asignToRider: function (riderId, displayName) {
                 var me = this.up('dzp');
                 var grid = me.down('grid[itemId=shopOrderGrid]');
                 if (!grid.getSelection() || grid.getSelection().length == 0)return;
                 var orderRecord = grid.getSelection()[0];
-                Ext.Msg.confirm('确认', '确认指派?', function (r) {
+                Ext.Msg.confirm('确认', '确认指派' + displayName + "?", function (r) {
                     if (r !== 'yes') return;
                     Ext.Ajax.request({
                         method: 'POST',
                         url: '/meituan/orders/' + orderRecord.get('id') + '/asign/' + riderId,
-
                         success: function (response, opts) {
-                            var obj = Ext.decode(response.responseText);
-                            console.dir(obj);
+                            grid.getStore().load({
+                                scope: this,
+                                callback: function (records, operation, success) {
+                                    grid.setSelection(records[0])
+                                    console.log(records);
+                                }
+                            });
                         },
-
                         failure: function (response, opts) {
                             console.log('server-side failure with status code ' + response.status);
                         }

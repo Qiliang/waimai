@@ -3,6 +3,7 @@ package com.xiaoql.domain;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -14,6 +15,7 @@ public class Rider extends JPAEntity {
     @Id
     private String id;
     private String name;
+    @Column(unique = true)
     private String phone;
     private String loginName;
     private String loginPassword;

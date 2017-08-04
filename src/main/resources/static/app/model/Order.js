@@ -21,6 +21,12 @@ Ext.define('Kits.model.Order', {
         {name: 'riderAssignTime', type: 'date', dateFormat: 'time'},
         {name: 'riderGetGoodsTime', type: 'date', dateFormat: 'time'},
         {name: 'riderToUserTime', type: 'date', dateFormat: 'time'},
-        {name: 'description', type: 'string'}
+        {name: 'description', type: 'string'},
+        {
+            name: 'riderName', type: 'string', persist: false,
+            mapping: function (data) {
+                return data.rider ? +data.rider.phone + ':' + data.rider.name : null;
+            }
+        }
     ]
 })

@@ -1,9 +1,6 @@
 package com.xiaoql.web;
 
-import com.xiaoql.domain.Shop;
-import com.xiaoql.domain.ShopOrder;
-import com.xiaoql.domain.ShopOrderRepository;
-import com.xiaoql.domain.ShopRepository;
+import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +18,9 @@ public class MeituanController {
 
     @Autowired
     private ShopOrderRepository shopOrderRepository;
+
+    @Autowired
+    private RiderRepository riderRepository;
 
     @Autowired
     private ShopRepository shopRepository;
@@ -77,6 +78,15 @@ public class MeituanController {
         return shopOrderRepository.findAll();
     }
 
+    @GetMapping(value = {"/orders"}, params = {"state"})
+    public List<ShopOrder> orders(@RequestParam String state) {
+        if ("dzp".equalsIgnoreCase(state)) {
+            return shopOrderRepository.findByRiderIdIsNull();
+        } else {
+            return shopOrderRepository.findByRiderState(state);
+        }
+    }
+
     @PutMapping({"/orders/{id}"})
     public void orders(@PathVariable String id, @RequestBody Map<String, Object> toOrder, HttpServletResponse response) {
         ShopOrder shopOrder = shopOrderRepository.getOne(id);
@@ -88,7 +98,6 @@ public class MeituanController {
         shopOrderRepository.save(shopOrder);
     }
 
-
     @PostMapping({"/orders/{id}/asign/{riderId}"})
     public void orderAsignRider(@PathVariable String id, @PathVariable String riderId, HttpServletResponse response) {
         ShopOrder shopOrder = shopOrderRepository.getOne(id);
@@ -96,7 +105,25 @@ public class MeituanController {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        shopOrder.setRiderId(riderId);
+        Rider rider = riderRepository.getOne(riderId);
+        shopOrder.setRiderState("psz");
+        shopOrder.setRiderAssignTime(new Date());
+        shopOrder.setRider(rider);
+        shopOrderRepository.save(shopOrder);
+    }
+
+    @PostMapping({"/orders/{id}/reasign/{riderDisplayName}"})
+    public void orderReAsignRider(@PathVariable String id, @PathVariable String riderDisplayName, HttpServletResponse response) {
+        String[] parts = riderDisplayName.split(":");
+        ShopOrder shopOrder = shopOrderRepository.getOne(id);
+        if (shopOrder == null) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        Rider rider = riderRepository.findByPhone(parts[0]);
+        shopOrder.setRiderState("psz");
+        shopOrder.setRiderAssignTime(new Date());
+        shopOrder.setRider(rider);
         shopOrderRepository.save(shopOrder);
     }
 

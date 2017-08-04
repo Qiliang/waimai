@@ -42,6 +42,7 @@ Ext.define('Kits.view.BMap', {
     },
 
     markerOrder: function (rec) {
+        if (!rec)return;
         var me = this;
         var orderLng = parseFloat(rec.get('orderLng')) / 1000000;
         var orderLat = parseFloat(rec.get('orderLat')) / 1000000;
@@ -56,12 +57,17 @@ Ext.define('Kits.view.BMap', {
             markerSong.setIcon(me.mSong);
             me.bmap.addOverlay(markerSong);
             markerSong.setLabel(new BMap.Label(rec.get('userAddress'), {offset: new BMap.Size(20, -10)}));
+            markerSong.addEventListener("mouseover", me.markerMouseover.bind(markerSong));
+            markerSong.addEventListener("mouseout", me.markerMouseout.bind(markerSong));
+
 
             var markerQu = new BMap.Marker(data.points[1]);
             me.orderMarkers.push(markerQu);
             markerQu.setIcon(me.mQu);
             me.bmap.addOverlay(markerQu);
             markerQu.setLabel(new BMap.Label(rec.get('shopName'), {offset: new BMap.Size(20, -10)}));
+            markerQu.addEventListener("mouseover", me.markerMouseover.bind(markerQu));
+            markerQu.addEventListener("mouseout", me.markerMouseout.bind(markerQu));
 
             me.bmap.panTo(data.points[0]);
             var line = new BMap.Polyline(data.points);
@@ -69,14 +75,19 @@ Ext.define('Kits.view.BMap', {
             line.setStrokeOpacity(0.5);
             line.setStrokeStyle("dashed");
             me.bmap.addOverlay(line);
-            //var markerMenu = new BMap.ContextMenu();
-            //markerMenu.addItem(new BMap.MenuItem('指定骑手', me.asignToRider.bind(marker)));
-            //marker.addContextMenu(markerMenu);
+
         });
 
 
-    }
-    ,
+    },
+
+    markerMouseover: function () {
+        this.setTop(true)
+    },
+
+    markerMouseout: function () {
+        this.setTop(false)
+    },
 
     afterRender: function () {
         this.callParent(arguments);
@@ -91,18 +102,20 @@ Ext.define('Kits.view.BMap', {
                         var lng = parseFloat(rec.get('lng')) / 1000000;
                         var lat = parseFloat(rec.get('lat')) / 1000000;
                         var riderId = rec.get("id");
+                        var displayName = rec.get("displayName");
                         if (isNaN(lng) || isNaN(lat))return;
                         var convertor = new BMap.Convertor();
                         convertor.translate([new BMap.Point(lng, lat)], 3, 5, function (data) {
                             var label = new BMap.Label(rec.get('name'), {offset: new BMap.Size(20, -10)});
                             var marker = new BMap.Marker(data.points[0]);
                             marker.setIcon(me.mQi);
+                            marker.setZIndex(10);
                             me.bmap.addOverlay(marker);
                             marker.setLabel(label);
                             var markerMenu = new BMap.ContextMenu();
                             markerMenu.addItem(new BMap.MenuItem('指派',
                                 function () {
-                                    me.asignToRider(riderId);
+                                    me.asignToRider(riderId,displayName);
                                 }.bind(me)));
                             marker.addContextMenu(markerMenu);
                         });
@@ -112,34 +125,6 @@ Ext.define('Kits.view.BMap', {
             }
 
         });
-        // Ext.create('Kits.store.Order', {
-        //     listeners: {
-        //         load: function (store, records, successful, operation, eOpts) {
-        //             if (!successful)return;
-        //             console.log(records)
-        //             Ext.each(records, function (rec) {
-        //                 var mFrom = new BMap.Icon('/marker/from.png', new BMap.Size(16, 32));
-        //                 var mTo = new BMap.Icon('/marker/to.png', new BMap.Size(16, 32));
-        //                 var orderLng = parseFloat(rec.get('orderLng')) / 1000000;
-        //                 var orderLat = parseFloat(rec.get('orderLat')) / 1000000;
-        //                 var convertor = new BMap.Convertor();
-        //                 convertor.translate([new BMap.Point(orderLng, orderLat)], 3, 5, function (data) {
-        //                     console.log(data)
-        //                     var label = new BMap.Label(rec.get('userAddress'), {offset: new BMap.Size(20, -10)});
-        //                     var marker = new BMap.Marker(data.points[0]);
-        //                     marker.setIcon(mTo);
-        //                     me.bmap.addOverlay(marker);
-        //                     marker.setLabel(label);
-        //                     var markerMenu = new BMap.ContextMenu();
-        //                     markerMenu.addItem(new BMap.MenuItem('指定骑手', me.asignToRider.bind(marker)));
-        //                     marker.addContextMenu(markerMenu);
-        //                 });
-        //
-        //             })
-        //         }
-        //     }
-        //
-        // });
     }
 
 

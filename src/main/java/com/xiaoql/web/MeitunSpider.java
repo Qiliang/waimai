@@ -1,9 +1,9 @@
 package com.xiaoql.web;
 
 import com.xiaoql.SpringApplicationContextHolder;
-import com.xiaoql.domain.ShopOrderRepository;
 import com.xiaoql.domain.Shop;
 import com.xiaoql.domain.ShopOrder;
+import com.xiaoql.domain.ShopOrderRepository;
 import com.xiaoql.domain.ShopRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -24,15 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/meituan/spider")
+@Transactional
 public class MeitunSpider {
 
     @Value("${phantomjs.path}")
     private String phantomjsPath;
+
+    private final Map<String, PhantomJSDriver> driverMap = new HashMap<>();
 
     @Autowired
     private SpringApplicationContextHolder springApplicationContextHolder;
@@ -62,30 +67,80 @@ public class MeitunSpider {
     }
 
     @PostMapping({"/{id}"})
+//    @Transactional
     public Object get(@PathVariable String id) {
-        //executorService.execute(() -> orderSpider(id));
+        // String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
+        // executorService.execute(()->orderSpider(id));
+        Shop shop = shopRepository.findById(id);
+
+        if (driverMap.containsKey(id)) {
+          WebDriver webDriver=  driverMap.remove(id);
+          try{
+              webDriver.close();
+              webDriver.quit();
+          }catch (Exception e){
+
+          }
+
+        }
+        PhantomJSDriver driver = getPhantomJs();
+        driverMap.put(id, driver);
+
+        driver.get("http://e.waimai.meituan.com/logon");
+        System.out.println(driver.getTitle());
+        driver.switchTo().frame("J-logon-iframe");
+        driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+        driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
+        WebElement img = driver.findElementByCssSelector("#login-form img");
+        System.out.println(img.getAttribute("src"));
+        return img.getAttribute("src");
+    }
+
+
+    @PostMapping({"/{id}/login"})
+    @Transactional
+    public Object login(@PathVariable String id, String code) {
+        Shop shop = shopRepository.findById(id);
+        PhantomJSDriver driver = driverMap.get(id);
+        driver.switchTo().frame("J-logon-iframe");
+        driver.executeScript("$('input.login__captcha').value='"+code+"'");
+        //driver.findElementByCssSelector("input.login__captcha").sendKeys(code);
+        driver.findElementByCssSelector(".login__submit").click();
         return new RestResponse();
     }
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 10 * 60 * 1000)
+    //@Scheduled(initialDelay = 10000, fixedDelay = 10 * 1000)
     @Transactional
     public void orderSpider() {
         String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
 //        final ShopRepository shopRepository = SpringApplicationContextHolder.bean(ShopRepository.class);
 //        final ShopOrderRepository shopOrderRepository = SpringApplicationContextHolder.bean(ShopOrderRepository.class);
-        Shop shop = shopRepository.getOne(id);
-        if (shop.isStealing()) return;
-        shop.setStealing(true);
+        PhantomJSDriver driver = driverMap.get(id);
+        if (driver == null) return;
+        if (driver.getCurrentUrl().contains("logon")) return;
+        driver.switchTo().defaultContent();
+        Shop shop = shopRepository.findById(id);
+//        if (shop.isStealing()) return;
+//        shop.setStealing(true);
         shopRepository.save(shop);
-        PhantomJSDriver driver = getPhantomJs();
+
         try {
-            driver.get("http://e.waimai.meituan.com/logon");
-            System.out.println(driver.getTitle());
-            driver.switchTo().frame("J-logon-iframe");
-            driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
-            driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
-            driver.findElementByCssSelector(".login__submit").click();
-            sleep(3000);
+//            driver.get("http://e.waimai.meituan.com/logon");
+//            System.out.println(driver.getTitle());
+//            driver.switchTo().frame("J-logon-iframe");
+//            driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+//            driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
+//            WebElement img = driver.findElementByCssSelector("#login-form img");
+//            System.out.println(img.getAttribute("src"));
+//            sleep(30000000);
+//
+//            //return;
+//            driver.findElementByCssSelector(".login__submit").click();
+//            sleep(3000);
+
+            if (hasElement(driver, "#J-login-area")) {
+                return;
+            }
 
             driver.get("http://e.waimai.meituan.com/#/v2/shop/manage/shopInfo");
             driver.switchTo().frame("hashframe");
@@ -138,9 +193,17 @@ public class MeitunSpider {
         } catch (Exception e) {
             throw e;
         } finally {
-            driver.quit();
-            shop.setStealing(false);
-            shopRepository.save(shop);
+            //driver.quit();
+            //shop.setStealing(false);
+            //shopRepository.save(shop);
+        }
+    }
+
+    private boolean hasElement(PhantomJSDriver driver, String selector) {
+        try {
+            return driver.findElementByCssSelector(selector) != null;
+        } catch (Exception e) {
+            return false;
         }
     }
 

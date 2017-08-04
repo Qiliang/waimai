@@ -7,4 +7,6 @@ import java.util.List;
 public interface RiderRepository extends JpaRepository<Rider, String> {
 
     List<Rider> findByLoginName(String loginName);
+
+    Rider findByPhone(String phone);
 }

@@ -2,12 +2,13 @@ package com.xiaoql.domain;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class ShopOrder extends JPAEntity {
 
     @Id
@@ -37,7 +38,13 @@ public class ShopOrder extends JPAEntity {
     private String shopLat;//纬度
     private String orderLng;
     private String orderLat;
-    private String riderId;
+
+
+    @OneToOne()
+    @JoinColumn(name = "riderId")
+    private Rider rider;
+    //private String riderId;
+    private String riderState;
     private Date riderAssignTime;//订单分配给骑手的时间
     private Date riderGetGoodsTime;//骑手拿到货品的时间
     private Date riderToUserTime;//骑手送达给客户的时间
@@ -48,6 +55,22 @@ public class ShopOrder extends JPAEntity {
 
     @LastModifiedDate
     private Date lastModifiedDate;
+
+    public Rider getRider() {
+        return rider;
+    }
+
+    public void setRider(Rider rider) {
+        this.rider = rider;
+    }
+
+    public String getRiderState() {
+        return riderState;
+    }
+
+    public void setRiderState(String riderState) {
+        this.riderState = riderState;
+    }
 
     public Date getCreatedDate() {
         return createdDate;
@@ -119,14 +142,6 @@ public class ShopOrder extends JPAEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getRiderId() {
-        return riderId;
-    }
-
-    public void setRiderId(String riderId) {
-        this.riderId = riderId;
     }
 
     public String getShopLng() {

@@ -98,21 +98,46 @@ Ext.define('Kits.view.Shop', {
                     }
                 },
                 {
-                    iconCls: 'actionColumnRed x-fa fa-ban',
+                    iconCls: 'actionColumnRed x-fa fa-hand-paper-o',
                     tooltip: '爬取',
                     handler: function (view, recIndex, cellIndex, item, e, record) {
+                        var grid = view.up('grid');
                         Ext.Msg.confirm('确认', '确认爬取?', function (r) {
                             if (r != 'yes')return;
+                            grid.mask('加载中');
                             Ext.Ajax.request({
                                 method: 'POST',
+                                timeout: 60 * 1000,
                                 url: '/meituan/spider/' + record.get('id'),
-
                                 success: function (response, opts) {
-                                    var obj = Ext.decode(response.responseText);
-                                    console.dir(obj);
+                                    grid.unmask();
+                                    Ext.create('Ext.window.Window', {
+                                        height: 130,
+                                        width: 280,
+                                        layout: {
+                                            type: 'vbox',
+                                            pack: 'center'
+                                        },
+                                        items: [
+                                            {xtype: 'image', src: response.responseText},
+                                            {xtype: 'textfield', fieldLabel: '输入验证码', itemId: 'vCode'},
+                                            {
+                                                xtype: 'button', text: '确认',
+                                                handler: function () {
+                                                    var code = this.up('window').down('textfield').getValue();
+                                                    Ext.Ajax.request({
+                                                        method: 'POST',
+                                                        url: '/meituan/spider/' + record.get('id') + '/login?code=' + code
+                                                    })
+                                                }
+                                            }
+                                        ],
+                                        closeAction: 'destroy'
+                                    }).show();
                                 },
 
                                 failure: function (response, opts) {
+                                    grid.unmask();
                                     console.log('server-side failure with status code ' + response.status);
                                 }
                             });
