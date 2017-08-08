@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/meituan")
@@ -28,7 +29,10 @@ public class MeituanController {
 
     @GetMapping({"/shops"})
     public List<Shop> shops() {
-        return shopRepository.findAll();
+        return shopRepository.findAll().stream().map(shop -> {
+            shop.setStealing(MeitunSpider.DRIVERMAP.containsKey(shop.getId()));
+            return shop;
+        }).collect(Collectors.toList());
     }
 
     @PutMapping("/shops/{id}")
@@ -75,15 +79,15 @@ public class MeituanController {
 
     @GetMapping({"/orders"})
     public List<ShopOrder> orders() {
-        return shopOrderRepository.findAll();
+        return shopOrderRepository.findAllByOrderByTimeDesc();
     }
 
     @GetMapping(value = {"/orders"}, params = {"state"})
     public List<ShopOrder> orders(@RequestParam String state) {
         if ("dzp".equalsIgnoreCase(state)) {
-            return shopOrderRepository.findByRiderIdIsNull();
+            return shopOrderRepository.findByRiderIdIsNullOrderByTimeDesc();
         } else {
-            return shopOrderRepository.findByRiderState(state);
+            return shopOrderRepository.findByRiderStateOrderByTimeDesc(state);
         }
     }
 

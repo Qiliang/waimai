@@ -41,13 +41,13 @@ public class ShopOrder extends JPAEntity {
 
 
     @OneToOne()
-    @JoinColumn(name = "riderId")
+    @JoinColumn()
     private Rider rider;
-    //private String riderId;
     private String riderState;
     private Date riderAssignTime;//订单分配给骑手的时间
     private Date riderGetGoodsTime;//骑手拿到货品的时间
     private Date riderToUserTime;//骑手送达给客户的时间
+    @Lob
     private String description;
 
     @CreatedDate

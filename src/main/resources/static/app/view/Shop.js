@@ -27,6 +27,26 @@ Ext.define('Kits.view.Shop', {
 
             me.getStore().insert(0, rec);
         }
+    }, {
+        iconCls: 'x-fa fa-hand-paper-o',
+        text: '抓取数据',
+        handler: function () {
+            var grid = this.up('grid')
+            grid.mask('开启抓取工具，请耐心等待');
+            Ext.Ajax.request({
+                method: 'POST',
+                timeout: 2 * 60 * 1000,
+                url: '/meituan/spider/onAll',
+                success: function (response, opts) {
+                    grid.unmask();
+                    grid.getStore().load();
+                },
+                failure: function (response, opts) {
+                    grid.unmask();
+                    console.log('server-side failure with status code ' + response.status);
+                }
+            });
+        }
     }],
     columns: [
         {
@@ -81,6 +101,12 @@ Ext.define('Kits.view.Shop', {
             }
         },
         {
+            flex: 1,
+            text: '抓取状态',
+            dataIndex: 'stealing'
+
+        },
+        {
             flex:1,
             xtype: 'actioncolumn',
             width: 30,
@@ -111,6 +137,7 @@ Ext.define('Kits.view.Shop', {
                                 url: '/meituan/spider/' + record.get('id'),
                                 success: function (response, opts) {
                                     grid.unmask();
+                                    if (!response.responseText)return;
                                     Ext.create('Ext.window.Window', {
                                         height: 130,
                                         width: 280,

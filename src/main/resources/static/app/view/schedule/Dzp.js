@@ -19,6 +19,15 @@ Ext.define('Kits.view.schedule.Dzp', {
                     url: '/meituan/orders?state=dzp'
                 }
             }),
+            tools: [
+                {
+                    type: 'refresh',
+                    tooltip: '刷新',
+                    callback: function (panel, tool, event) {
+                        panel.getStore().load();
+                    }
+                }
+            ],
             tbar: [
                 {
                     xtype: 'combo',
@@ -30,7 +39,7 @@ Ext.define('Kits.view.schedule.Dzp', {
                 }
             ],
             columns: [
-                {text: '商家名称', dataIndex: 'userAddress', flex: 1}
+                {text: '订单地址', dataIndex: 'userAddress', flex: 1}
             ],
             width: 200,
             listeners: {
@@ -82,6 +91,15 @@ Ext.define('Kits.view.schedule.Dzp', {
                     displayField: 'name',
                     valueField: 'id',
                     flex: 1
+                }
+            ],
+            tools: [
+                {
+                    type: 'refresh',
+                    tooltip: '刷新',
+                    callback: function (panel, tool, event) {
+                        panel.getStore().load();
+                    }
                 }
             ],
             columns: [

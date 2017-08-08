@@ -3,13 +3,16 @@ package com.xiaoql.domain;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Entity
-@Lazy(value = false)
+@EntityListeners(AuditingEntityListener.class)
 public class Shop extends JPAEntity {
 
     @Id
@@ -26,6 +29,7 @@ public class Shop extends JPAEntity {
     private String loginName;
     private String loginPassword;
 
+    @Transient
     private boolean stealing;
     @CreatedDate
     private Date createdDate;
