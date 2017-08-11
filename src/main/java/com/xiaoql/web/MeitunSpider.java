@@ -7,20 +7,19 @@ import com.xiaoql.domain.ShopOrder;
 import com.xiaoql.domain.ShopOrderRepository;
 import com.xiaoql.domain.ShopRepository;
 import okhttp3.*;
+import okhttp3.RequestBody;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -134,6 +133,14 @@ public class MeitunSpider {
     }
 
 
+    @GetMapping({"/{id}/screenshot"})
+    public String screenshot(@PathVariable String id) {
+        SimpleDriver driver = DRIVERMAP.get(id);
+        if (driver == null) return "";
+        return driver.getScreenshotAs(OutputType.BASE64);
+    }
+
+
     @PostMapping({"/{id}/login"})
     @Transactional
     public Object login(@PathVariable String id, String code) {
@@ -176,11 +183,13 @@ public class MeitunSpider {
     }
 
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 60 * 1000)
+    @Scheduled(initialDelay = 10000, fixedDelay = 3 * 60 * 1000)
     public void orderSpider() {
 
         for (Shop shop : shopRepository.findAll()) {
-            lookShopOrder(shop.getId());
+            String shopId = shop.getId();
+            executorService.execute(() -> lookShopOrder(shopId));
+            //lookShopOrder(shop.getId());
         }
 
     }
@@ -192,36 +201,50 @@ public class MeitunSpider {
         driver.switchTo().defaultContent();
         Shop shop = shopRepository.findOne(id);
         //shopRepository.save(shop);
+        long begin = System.currentTimeMillis();
         System.out.println(shop.getName());
         try {
 
-            if (driver.find1("#J-login-area") != null) {
-                return;
+//            if (driver.find1("#J-login-area") != null) {
+//                return;
+//            }
+//
+//            driver.get("http://e.waimai.meituan.com/#/v2/shop/manage/shopInfo");
+//            driver.switchTo().frame("hashframe");
+//            shop.setMeituanId(driver.findElementByCssSelector("a.shop-link").getAttribute("href"));
+//            shop.setName(driver.findElementByCssSelector("h4.poi-name").getText());
+//            shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText().split("：")[1]);
+//            shop.setPhone(driver.findElementByCssSelector("span.telephone-show").getText());
+//            shopRepository.saveAndFlush(shop);
+            //body > div.content-wrapper > div.panel.panel-default > form > div > div:nth-child(1) > div > div > label:nth-child(1)
+            if (!driver.getCurrentUrl().contains("/v2/order/history")) {
+                driver.switchTo().defaultContent();
+                driver.get("http://e.waimai.meituan.com/#/v2/order/history");
+                driver.switchTo().frame("hashframe");
+            } else {
+                driver.switchTo().frame("hashframe");
+                //点击全部订单
+                WebElement allOrders = driver.findElementByCssSelector("body > div.content-wrapper > div.panel.panel-default > form > div > div:nth-child(1) > div > div > label:nth-child(1)");
+                allOrders.click();
             }
 
-            driver.get("http://e.waimai.meituan.com/#/v2/shop/manage/shopInfo");
-            driver.switchTo().frame("hashframe");
-            shop.setMeituanId(driver.findElementByCssSelector("a.shop-link").getAttribute("href"));
-            shop.setName(driver.findElementByCssSelector("h4.poi-name").getText());
-            shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText().split("：")[1]);
-            shop.setPhone(driver.findElementByCssSelector("span.telephone-show").getText());
-            shopRepository.saveAndFlush(shop);
 
-            driver.switchTo().defaultContent();
-            driver.get("http://e.waimai.meituan.com/#/v2/order/history");
-            driver.switchTo().frame("hashframe");
-
-            WebElement btnNext;
-            do {
-                btnNext = driver.findElementByCssSelector("button.J-next-page");
-
+            Actions actions = new Actions(driver);
+//            WebElement btnNext;
+//            do {
                 WebElement orderContent = driver.findElementByCssSelector("ul.J-order-list");
+                sleep(1000);
+                Document ulDoc = Jsoup.parse(orderContent.getAttribute("innerHTML"));
+                if (ulDoc.select("#exception-pro").size() == 1) {
+                    System.out.println(ulDoc.select("#exception-pro").text());
+                    return;
+                }
+
                 for (WebElement li : orderContent.findElements(By.cssSelector("li.order-list-item"))) {
-                    Actions actions=new Actions(driver);
+
                     actions.moveToElement(li).build().perform();
-                    sleep(200);
-                    Document liDoc = Jsoup.parse(li.getAttribute("outerHTML"));
                     String orderId = li.getAttribute("id");
+                    Document liDoc = Jsoup.parse(li.getAttribute("outerHTML"));
                     ShopOrder order = shopOrderRepository.findOne(orderId);
                     if (order == null) {
                         Date orderTime = new Date();
@@ -250,14 +273,18 @@ public class MeitunSpider {
                     shopOrderRepository.saveAndFlush(order);
                 }
 
-                if (!btnNext.isEnabled()) continue;
-                btnNext.click();
-            }
-            while (btnNext.isEnabled());
+//                btnNext = driver.findElementByCssSelector("button.J-next-page");
+//                actions.moveToElement(btnNext).build().perform();
+//                if (!btnNext.isEnabled()) continue;
+//                btnNext.click();
+//            }
+//            while (btnNext.isEnabled());
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            long end = System.currentTimeMillis();
+            System.out.println(shop.getName() + ':' + ((end - begin) / 1000));
             //driver.quit();
             //shop.setStealing(false);
             //shopRepository.save(shop);
@@ -298,7 +325,8 @@ public class MeitunSpider {
         if (liDoc.getElementsByClass("J-search-address").hasText()) {
             return liDoc.getElementsByClass("J-search-address").text();
         } else {
-            String src = liDoc.getElementsByClass("J-search-address").get(0).getElementsByTag("img").get(0).attr("src");
+            String src = liDoc.select(".J-search-address img").attr("src");
+            //String src = liDoc.getElementsByClass("J-search-address").get(0).getElementsByTag("img").get(0).attr("src");
             return ocr(src.substring(22));
         }
     }
@@ -307,7 +335,8 @@ public class MeitunSpider {
         if (liDoc.getElementsByClass("J-user-phone").hasText()) {
             return liDoc.getElementsByClass("J-user-phone").text();
         } else {
-            String src = liDoc.getElementsByClass("J-user-phone").get(0).getElementsByTag("img").get(0).attr("src");
+            String src = liDoc.select(".J-user-phone img").attr("src");
+            //String src = liDoc.getElementsByClass("J-user-phone").get(0).getElementsByTag("img").get(0).attr("src");
             return ocr(src.substring(22));
         }
 

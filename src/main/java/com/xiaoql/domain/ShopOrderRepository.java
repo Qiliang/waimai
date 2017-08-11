@@ -10,6 +10,8 @@ public interface ShopOrderRepository extends JpaRepository<ShopOrder, String>, J
 
     List<ShopOrder> findByTimeAfter(Date date);
 
+    List<ShopOrder> findByRiderIdOrderByTimeDesc(String riderId);
+
     List<ShopOrder> findByRiderIdIsNullOrderByTimeDesc();
 
     List<ShopOrder> findByRiderStateOrderByTimeDesc(String riderState);

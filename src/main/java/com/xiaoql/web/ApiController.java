@@ -24,6 +24,12 @@ public class ApiController {
     @Autowired
     private RiderRepository riderRepository;
 
+    @GetMapping("/stat")
+    public Object stat() {
+        return shopOrderRepository;
+    }
+
+
     @GetMapping("/users")
     public List<User> users() {
         return userRepository.findAll();
@@ -61,8 +67,12 @@ public class ApiController {
 
 
     @GetMapping("/riders")
-    public List<Rider> riders() {
+    public List<Rider> riders(@RequestParam(required = false) Boolean active) {
+        if (active == null)
         return riderRepository.findAll();
+        else {
+            return riderRepository.findByActive(active);
+        }
     }
 
     @PutMapping("/riders/{id}")

@@ -21,6 +21,7 @@ public class Rider extends JPAEntity {
     private String loginPassword;
     private String lng;
     private String lat;
+    private boolean active;
 
     @CreatedDate
     private Date createdDate;
@@ -30,6 +31,14 @@ public class Rider extends JPAEntity {
 
     @Transient
     private int orderCount;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     public int getOrderCount() {
         return orderCount;

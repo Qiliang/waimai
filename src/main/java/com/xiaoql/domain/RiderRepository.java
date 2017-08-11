@@ -8,5 +8,9 @@ public interface RiderRepository extends JpaRepository<Rider, String> {
 
     List<Rider> findByLoginName(String loginName);
 
+    Rider findByLoginNameAndLoginPassword(String loginName, String loginPassword);
+
     Rider findByPhone(String phone);
+
+    List<Rider> findByActive(boolean active);
 }

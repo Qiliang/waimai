@@ -71,7 +71,7 @@ Ext.define('Kits.view.Rider', {
             text: '最后活跃时间',
             dataIndex: 'lastModifyTime',
             xtype: 'datecolumn',
-            format: 'Y-m-d h:i:s'
+            format: 'Y-m-d H:i:s'
         },
         {
             flex:1,

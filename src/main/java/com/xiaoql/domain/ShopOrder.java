@@ -45,8 +45,13 @@ public class ShopOrder extends JPAEntity {
     private Rider rider;
     private String riderState;
     private Date riderAssignTime;//订单分配给骑手的时间
+    private Date riderReadTime;//骑手读取订单的时间
     private Date riderGetGoodsTime;//骑手拿到货品的时间
+    private String riderGetGoodsLng;
+    private String riderGetGoodsLat;
     private Date riderToUserTime;//骑手送达给客户的时间
+    private String riderToUserLng;
+    private String riderToUserLat;
     @Lob
     private String description;
 
@@ -55,6 +60,46 @@ public class ShopOrder extends JPAEntity {
 
     @LastModifiedDate
     private Date lastModifiedDate;
+
+    public Date getRiderReadTime() {
+        return riderReadTime;
+    }
+
+    public void setRiderReadTime(Date riderReadTime) {
+        this.riderReadTime = riderReadTime;
+    }
+
+    public String getRiderGetGoodsLng() {
+        return riderGetGoodsLng;
+    }
+
+    public void setRiderGetGoodsLng(String riderGetGoodsLng) {
+        this.riderGetGoodsLng = riderGetGoodsLng;
+    }
+
+    public String getRiderGetGoodsLat() {
+        return riderGetGoodsLat;
+    }
+
+    public void setRiderGetGoodsLat(String riderGetGoodsLat) {
+        this.riderGetGoodsLat = riderGetGoodsLat;
+    }
+
+    public String getRiderToUserLng() {
+        return riderToUserLng;
+    }
+
+    public void setRiderToUserLng(String riderToUserLng) {
+        this.riderToUserLng = riderToUserLng;
+    }
+
+    public String getRiderToUserLat() {
+        return riderToUserLat;
+    }
+
+    public void setRiderToUserLat(String riderToUserLat) {
+        this.riderToUserLat = riderToUserLat;
+    }
 
     public Rider getRider() {
         return rider;

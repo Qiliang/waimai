@@ -26,9 +26,9 @@ Ext.define('Kits.view.schedule.Yc', {
             text: '骑手', dataIndex: 'riderName', width: 100
 
         },
-        {text: '指派时间', dataIndex: 'riderAssignTime', width: 150, xtype: 'datecolumn', format: 'Y-m-d h:i:s'},
+        {text: '指派时间', dataIndex: 'riderAssignTime', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
         {text: '描述', dataIndex: 'description'},
-        {text: '时间', dataIndex: 'time', xtype: 'datecolumn', format: 'Y-m-d h:i:s'},
+        {text: '时间', dataIndex: 'time', xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
         {text: '状态', dataIndex: 'state'},
         {text: '客户', dataIndex: 'userName'},
         {text: '地址', dataIndex: 'userAddress'},

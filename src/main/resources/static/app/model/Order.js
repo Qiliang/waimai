@@ -18,6 +18,8 @@ Ext.define('Kits.model.Order', {
         {name: 'orderLng', type: 'string'},
         {name: 'orderLat', type: 'string'},
         {name: 'riderId', type: 'string'},
+        {name: 'createdDate', type: 'date', dateFormat: 'time'},
+        {name: 'lastModifiedDate', type: 'date', dateFormat: 'time'},
         {name: 'riderAssignTime', type: 'date', dateFormat: 'time'},
         {name: 'riderGetGoodsTime', type: 'date', dateFormat: 'time'},
         {name: 'riderToUserTime', type: 'date', dateFormat: 'time'},

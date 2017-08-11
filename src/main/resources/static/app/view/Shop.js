@@ -109,8 +109,6 @@ Ext.define('Kits.view.Shop', {
         {
             flex:1,
             xtype: 'actioncolumn',
-            width: 30,
-
             sortable: false,
             menuDisabled: true,
             items: [
@@ -123,6 +121,39 @@ Ext.define('Kits.view.Shop', {
                         }, this);
                     }
                 },
+                {
+                    iconCls: 'actionColumnRed x-fa fa-file-image-o',
+                    tooltip: '爬取状态',
+                    handler: function (view, recIndex, cellIndex, item, e, record) {
+                        var grid = view.up('grid');
+                        Ext.Msg.confirm('确认', '爬取状态?', function (r) {
+                            if (r != 'yes') return;
+                            grid.mask('加载中');
+                            Ext.Ajax.request({
+                                method: 'GET',
+                                timeout: 60 * 1000,
+                                url: '/meituan/spider/' + record.get('id') + '/screenshot',
+                                success: function (response, opts) {
+                                    grid.unmask();
+                                    if (!response.responseText)return;
+                                    Ext.create('Ext.window.Window', {
+                                        maximized: true,
+                                        title:'截图',
+                                        layout: 'fit',
+                                        items: {xtype: 'image', src: 'data:image/jpeg;base64,' + response.responseText},
+                                        closeAction: 'destroy'
+                                    }).show();
+                                },
+
+                                failure: function (response, opts) {
+                                    grid.unmask();
+                                    console.log('server-side failure with status code ' + response.status);
+                                }
+                            });
+                        }, this);
+                    }
+                },
+
                 {
                     iconCls: 'actionColumnRed x-fa fa-hand-paper-o',
                     tooltip: '爬取',

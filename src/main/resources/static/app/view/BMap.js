@@ -23,7 +23,7 @@ Ext.define('Kits.view.BMap', {
         this.callParent(arguments);
         // 百度地图API功能
         this.bmap = new BMap.Map('allmap', {minZoom: 14, maxZoom: 18});    // 创建Map实例
-        this.bmap.centerAndZoom('宜昌', 15);  // 初始化地图,设置中心点坐标和地图级别
+        this.bmap.centerAndZoom('宜昌', 16);  // 初始化地图,设置中心点坐标和地图级别
         this.bmap.addControl(new BMap.MapTypeControl());   //添加地图类型控件
         this.bmap.setCurrentCity("宜昌");          // 设置地图显示的城市 此项是必须设置的
         this.bmap.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
