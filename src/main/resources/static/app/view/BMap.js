@@ -108,6 +108,8 @@ Ext.define('Kits.view.BMap', {
                         convertor.translate([new BMap.Point(lng, lat)], 3, 5, function (data) {
                             var label = new BMap.Label(rec.get('name'), {offset: new BMap.Size(20, -10)});
                             var marker = new BMap.Marker(data.points[0]);
+                            marker.addEventListener("mouseover", me.markerMouseover.bind(marker));
+                            marker.addEventListener("mouseout", me.markerMouseout.bind(marker));
                             marker.setIcon(me.mQi);
                             marker.setZIndex(10);
                             me.bmap.addOverlay(marker);

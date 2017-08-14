@@ -6,8 +6,14 @@ import com.xiaoql.domain.ShopOrder;
 import com.xiaoql.domain.ShopOrderRepository;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -79,14 +85,17 @@ public class RiderController {
     /**
      * 骑手的订单
      */
-    @GetMapping("/orders")
-    public Object orders(String token, HttpServletResponse response) {
+    @PostMapping("/orders")
+    public Object orders(String token, String riderState,
+                         @PageableDefault(size = 50, page = 0, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable,
+                         HttpServletResponse response) {
+
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
         }
 
-        return shopOrderRepository.findByRiderIdOrderByTimeDesc(token);
+        return shopOrderRepository.findByRiderIdAndRiderState(token, riderState, pageable);
     }
 
     /**

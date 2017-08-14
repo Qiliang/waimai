@@ -29,5 +29,11 @@ Ext.define('Kits.view.Order', {
         // {text: '店铺纬度', dataIndex: 'shopLat'},
         // {text: '用户经度', dataIndex: 'orderLng'},
         // {text: '用户纬度', dataIndex: 'orderLat'}
-    ]
+    ],
+    bbar: {
+        xtype: 'pagingtoolbar',
+        displayInfo: true,
+        displayMsg: 'Displaying topics {0} - {1} of {2}',
+        emptyMsg: "No topics to display"
+    }
 });

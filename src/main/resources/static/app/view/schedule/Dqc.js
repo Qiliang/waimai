@@ -1,6 +1,6 @@
-Ext.define('Kits.view.schedule.Psz', {
+Ext.define('Kits.view.schedule.Dqc', {
     extend: 'Ext.grid.Panel',
-    title: '调度--配送中',
+    title: '调度--待取餐',
     plugins: [{
         ptype: 'rowediting',
         clicksToMoveEditor: 1,
@@ -23,7 +23,7 @@ Ext.define('Kits.view.schedule.Psz', {
             }
         }
     }],
-    store: Ext.create('Kits.store.Order', {proxy: {extraParams: {state: 'psz'}}}),
+    store: Ext.create('Kits.store.Order', {proxy: {extraParams: {state: 'dqc'}}}),
     layout: 'fit',
 
     tools: [

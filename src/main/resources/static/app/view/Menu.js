@@ -73,6 +73,12 @@ Ext.define('Kits.view.Menu', {
                         {
                             iconCls: 'x-fa fa-table',
                             leaf: true,
+                            text: '待取餐',
+                            cmp: 'Kits.view.schedule.Dqc'
+                        },
+                        {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
                             text: '配送中',
                             cmp: 'Kits.view.schedule.Psz'
                         }, {

@@ -63,32 +63,36 @@ public class MeitunSpider {
     public Object startAll() {
         // String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
         // executorService.execute(()->orderSpider(id));
-        shopRepository.findAll().stream().parallel().forEach(shop -> {
-            String id = shop.getId();
-            if (loginMap.containsKey(id)) {
-                WebDriver webDriver = loginMap.remove(id);
-                try {
-                    webDriver.close();
-                    webDriver.quit();
-                } catch (Exception e) {
+
+
+        executorService.execute(()->{
+            for (Shop shop : shopRepository.findAll()) {
+                String id = shop.getId();
+                if (loginMap.containsKey(id)) {
+                    WebDriver webDriver = loginMap.remove(id);
+                    try {
+                        webDriver.close();
+                        webDriver.quit();
+                    } catch (Exception e) {
+
+                    }
 
                 }
+                SimpleDriver driver = SimpleDriver.create(phantomjsPath);
+                loginMap.put(id, driver);
 
-            }
-            SimpleDriver driver = SimpleDriver.create(phantomjsPath);
-            loginMap.put(id, driver);
-
-            driver.get("http://e.waimai.meituan.com/logon");
-            System.out.println(driver.getTitle());
-            driver.switchTo().frame("J-logon-iframe");
-            driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
-            driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
-            WebElement img = driver.find1("#login-form img");
-            if (img != null) {
-                System.out.println(img.getAttribute("src"));
-            } else {
-                driver.findElementByCssSelector(".login__submit").click();
-                loginTo(id);
+                driver.get("http://e.waimai.meituan.com/logon");
+                System.out.println(driver.getTitle());
+                driver.switchTo().frame("J-logon-iframe");
+                driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+                driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
+                WebElement img = driver.find1("#login-form img");
+                if (img != null) {
+                    System.out.println(img.getAttribute("src"));
+                } else {
+                    driver.findElementByCssSelector(".login__submit").click();
+                    loginTo(id);
+                }
             }
         });
 
@@ -183,7 +187,7 @@ public class MeitunSpider {
     }
 
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 3 * 60 * 1000)
+    @Scheduled(initialDelay = 10000, fixedDelay = 4 * 60 * 1000)
     public void orderSpider() {
 
         for (Shop shop : shopRepository.findAll()) {

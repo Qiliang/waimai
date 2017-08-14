@@ -1,14 +1,8 @@
 Ext.define('Kits.view.schedule.Wc', {
     extend: 'Ext.grid.Panel',
     title: '调度--完成订单',
-    store: Ext.create('Kits.store.Order', {
-        proxy: {
-            type: 'rest',
-            url: '/meituan/orders?state=wc'
-        }
-    }),
+    store: Ext.create('Kits.store.Order', {proxy: {extraParams: {state: 'wc'}}}),
     layout: 'fit',
-
 
     tools: [
         {
@@ -31,5 +25,11 @@ Ext.define('Kits.view.schedule.Wc', {
         {text: '地址', dataIndex: 'userAddress'},
         {text: '电话', dataIndex: 'userPhone'},
         {text: '备注', dataIndex: 'remark'}
-    ]
+    ],
+    bbar: {
+        xtype: 'pagingtoolbar',
+        displayInfo: true,
+        displayMsg: 'Displaying topics {0} - {1} of {2}',
+        emptyMsg: "No topics to display"
+    }
 });

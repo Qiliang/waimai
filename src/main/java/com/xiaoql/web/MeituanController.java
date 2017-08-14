@@ -3,6 +3,10 @@ package com.xiaoql.web;
 import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +21,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/meituan")
 public class MeituanController {
 
+    public static final String DQC = "dqc";
+    //public static final String PSZ = "psz";
     @Autowired
     private ShopOrderRepository shopOrderRepository;
 
@@ -78,8 +84,8 @@ public class MeituanController {
     }
 
     @GetMapping({"/orders"})
-    public List<ShopOrder> orders() {
-        return shopOrderRepository.findAllByOrderByTimeDesc();
+    public Page<ShopOrder> orders(@PageableDefault(size = 50, page = 0, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        return shopOrderRepository.findAll(pageable);
     }
 
     @GetMapping(value = {"/orders"}, params = {"state"})
@@ -110,7 +116,7 @@ public class MeituanController {
             return;
         }
         Rider rider = riderRepository.getOne(riderId);
-        shopOrder.setRiderState("psz");
+        shopOrder.setRiderState(DQC);
         shopOrder.setRiderAssignTime(new Date());
         shopOrder.setRider(rider);
         shopOrderRepository.save(shopOrder);
@@ -125,7 +131,7 @@ public class MeituanController {
             return;
         }
         Rider rider = riderRepository.findByPhone(parts[0]);
-        shopOrder.setRiderState("psz");
+        shopOrder.setRiderState(DQC);
         shopOrder.setRiderAssignTime(new Date());
         shopOrder.setRider(rider);
         shopOrderRepository.save(shopOrder);
