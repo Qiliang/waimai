@@ -10,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -87,7 +84,7 @@ public class RiderController {
      */
     @PostMapping("/orders")
     public Object orders(String token, String riderState,
-                         @PageableDefault(size = 50, page = 0, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable,
+                         @PageableParam(size = 50, page = 1, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable,
                          HttpServletResponse response) {
 
         if (!riderRepository.exists(token)) {
@@ -101,8 +98,8 @@ public class RiderController {
     /**
      * 骑手的订单阅读时间
      */
-    @PostMapping("/orders/{orderId}/read")
-    public Object ordersNews(@PathVariable String orderId, String token, HttpServletResponse response) {
+    @PostMapping("/orders/read")
+    public Object ordersNews(@RequestParam String orderId,@RequestParam String token, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
@@ -116,8 +113,8 @@ public class RiderController {
     /**
      * 骑手取单
      */
-    @PostMapping("/orders/{orderId}/got")
-    public Object gotGoods(@PathVariable String orderId, String token, String lng, String lat, HttpServletResponse response) {
+    @PostMapping("/orders/got")
+    public Object gotGoods(@RequestParam String orderId,@RequestParam String token,@RequestParam String lng,@RequestParam String lat, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
@@ -135,8 +132,8 @@ public class RiderController {
     /**
      * 骑手完成订单
      */
-    @PostMapping("/orders/{orderId}/toUser")
-    public Object toUser(@PathVariable String orderId, String token, String lng, String lat, HttpServletResponse response) {
+    @PostMapping("/orders/toUser")
+    public Object toUser(@RequestParam String orderId,@RequestParam String token,@RequestParam String lng,@RequestParam String lat, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");

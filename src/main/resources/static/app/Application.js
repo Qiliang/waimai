@@ -3,6 +3,8 @@ Ext.define('Kits.Application', {
     namespace: 'Kits',
 
     requires: [
+        'Kits.override.ProxyServer',
+        'Kits.override.Sorter',
         'Kits.view.Main'
     ],
 

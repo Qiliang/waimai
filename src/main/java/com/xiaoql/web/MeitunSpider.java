@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,10 +65,10 @@ public class MeitunSpider {
         // String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
         // executorService.execute(()->orderSpider(id));
 
-
-        executorService.execute(()->{
+        executorService.execute(() -> {
             for (Shop shop : shopRepository.findAll()) {
                 String id = shop.getId();
+
                 if (loginMap.containsKey(id)) {
                     WebDriver webDriver = loginMap.remove(id);
                     try {
@@ -80,19 +81,17 @@ public class MeitunSpider {
                 }
                 SimpleDriver driver = SimpleDriver.create(phantomjsPath);
                 loginMap.put(id, driver);
-
                 driver.get("http://e.waimai.meituan.com/logon");
-                System.out.println(driver.getTitle());
+                sleep(1000);
                 driver.switchTo().frame("J-logon-iframe");
+
                 driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+                sleep(200);
                 driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
-                WebElement img = driver.find1("#login-form img");
-                if (img != null) {
-                    System.out.println(img.getAttribute("src"));
-                } else {
-                    driver.findElementByCssSelector(".login__submit").click();
-                    loginTo(id);
-                }
+                sleep(200);
+                driver.findElementByCssSelector(".login__submit").click();
+                loginTo(id);
+
             }
         });
 
@@ -101,19 +100,19 @@ public class MeitunSpider {
 
     @PostMapping({"/{id}"})
 //    @Transactional
-    public Object get(@PathVariable String id) {
+    public Object start(@PathVariable String id) {
         // String id = "d214ZnoxODIyOTM6bGlhbmcxMjM=";
         // executorService.execute(()->orderSpider(id));
         Shop shop = shopRepository.findById(id);
 
         if (loginMap.containsKey(id)) {
             WebDriver webDriver = loginMap.remove(id);
-          try{
-              webDriver.close();
-              webDriver.quit();
-          }catch (Exception e){
+            try {
+                webDriver.close();
+                webDriver.quit();
+            } catch (Exception e) {
 
-          }
+            }
 
         }
         SimpleDriver driver = SimpleDriver.create(phantomjsPath);
@@ -151,7 +150,7 @@ public class MeitunSpider {
         Shop shop = shopRepository.findById(id);
         SimpleDriver driver = loginMap.get(id);
         driver.switchTo().frame("J-logon-iframe");
-        driver.executeScript("$('input.login__captcha').value='"+code+"'");
+        driver.executeScript("$('input.login__captcha').value='" + code + "'");
         //driver.findElementByCssSelector("input.login__captcha").sendKeys(code);
         driver.findElementByCssSelector(".login__submit").click();
         loginTo(id);
@@ -172,7 +171,7 @@ public class MeitunSpider {
         DRIVERMAP.put(id, loginMap.remove(id));
     }
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 10 * 10 * 1000)
+    @Scheduled(initialDelay = 10000, fixedDelay = 60 * 60 * 1000)
     @Transactional
     public void baiduToken() throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -185,6 +184,54 @@ public class MeitunSpider {
         Map<String, Object> result = objectMapper.readValue(response.body().string(), Map.class);
         access_token = result.get("access_token").toString();
     }
+
+
+    @Scheduled(initialDelay = 20 * 1000, fixedDelay = 60 * 1000)
+    public void logonSpider() {
+
+        for (Shop shop : shopRepository.findAll()) {
+            String shopId = shop.getId();
+            executorService.execute(() -> logonShop(shopId));
+        }
+
+    }
+
+    private void logon(SimpleDriver driver, Shop shop) {
+        driver.get("http://e.waimai.meituan.com/logon");
+        sleep(1000);
+        driver.switchTo().frame("J-logon-iframe");
+        driver.findElementByCssSelector("input.login__login").sendKeys(shop.getLoginName());
+        sleep(1000);
+        driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
+        sleep(1000);
+        driver.findElementByCssSelector(".login__submit").click();
+    }
+
+    private void logonShop(String id) {
+        SimpleDriver driver = DRIVERMAP.get(id);
+        Shop shop = shopRepository.findById(id);
+        if (driver == null) {
+            driver = SimpleDriver.create(phantomjsPath);
+        }
+        try {
+            URI uri = new URI(driver.getCurrentUrl());
+            if (StringUtils.isNotBlank(uri.getPath()) && uri.getPath().contains("order/history")) {
+                driver.switchTo().frame("hashframe");
+                Document mainDoc = Jsoup.parse(driver.findElementByCssSelector("body").getAttribute("innerHTML"));
+                if (mainDoc.select("#verify_img").size() > 0) {
+                    logon(driver, shop);
+                }
+            } else {
+                logon(driver, shop);
+            }
+            DRIVERMAP.put(id, driver);
+        } catch (Exception e) {
+            //driver.quit();
+        }
+
+    }
+
+
 
 
     @Scheduled(initialDelay = 10000, fixedDelay = 4 * 60 * 1000)
@@ -204,41 +251,19 @@ public class MeitunSpider {
         if (driver.getCurrentUrl().contains("logon")) return;
         driver.switchTo().defaultContent();
         Shop shop = shopRepository.findOne(id);
-        //shopRepository.save(shop);
         long begin = System.currentTimeMillis();
         System.out.println(shop.getName());
         try {
-
-//            if (driver.find1("#J-login-area") != null) {
-//                return;
-//            }
-//
-//            driver.get("http://e.waimai.meituan.com/#/v2/shop/manage/shopInfo");
-//            driver.switchTo().frame("hashframe");
-//            shop.setMeituanId(driver.findElementByCssSelector("a.shop-link").getAttribute("href"));
-//            shop.setName(driver.findElementByCssSelector("h4.poi-name").getText());
-//            shop.setAddress(driver.findElementByCssSelector("p.poi-address").getText().split("：")[1]);
-//            shop.setPhone(driver.findElementByCssSelector("span.telephone-show").getText());
-//            shopRepository.saveAndFlush(shop);
-            //body > div.content-wrapper > div.panel.panel-default > form > div > div:nth-child(1) > div > div > label:nth-child(1)
-            if (!driver.getCurrentUrl().contains("/v2/order/history")) {
-                driver.switchTo().defaultContent();
-                driver.get("http://e.waimai.meituan.com/#/v2/order/history");
-                driver.switchTo().frame("hashframe");
-            } else {
-                driver.switchTo().frame("hashframe");
-                //点击全部订单
-                WebElement allOrders = driver.findElementByCssSelector("body > div.content-wrapper > div.panel.panel-default > form > div > div:nth-child(1) > div > div > label:nth-child(1)");
-                allOrders.click();
-            }
-
-
+            long timestamp = new Date().getTime();
+            driver.get("http://e.waimai.meituan.com/?time=" + timestamp + "#/v2/order/history");
+            sleep(1000);
+            driver.switchTo().frame("hashframe");
             Actions actions = new Actions(driver);
 //            WebElement btnNext;
 //            do {
                 WebElement orderContent = driver.findElementByCssSelector("ul.J-order-list");
-                sleep(1000);
-                Document ulDoc = Jsoup.parse(orderContent.getAttribute("innerHTML"));
+
+            Document ulDoc = Jsoup.parse(orderContent.getAttribute("innerHTML"));
                 if (ulDoc.select("#exception-pro").size() == 1) {
                     System.out.println(ulDoc.select("#exception-pro").text());
                     return;
@@ -260,6 +285,7 @@ public class MeitunSpider {
                         order.setDescription(li.findElement(By.cssSelector(".product-list")).getText());
                         order.setShopAddress(shop.getAddress());
                         order.setShopName(shop.getName());
+                        order.setShopPhone(shop.getPhone());
                         order.setRemark(remark(liDoc));
                         order.setUserName(li.findElement(By.cssSelector("div.user-name")).getText());
                         order.setState(li.findElement(By.cssSelector("div.order-state")).getText());

@@ -19,6 +19,7 @@ public class ShopOrder extends JPAEntity {
     private String shopName;
 
     private String shopAddress;
+    private String shopPhone;
 
     private Date time;
 
@@ -115,6 +116,14 @@ public class ShopOrder extends JPAEntity {
 
     public void setRiderState(String riderState) {
         this.riderState = riderState;
+    }
+
+    public String getShopPhone() {
+        return shopPhone;
+    }
+
+    public void setShopPhone(String shopPhone) {
+        this.shopPhone = shopPhone;
     }
 
     public Date getCreatedDate() {

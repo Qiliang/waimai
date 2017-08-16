@@ -12,6 +12,7 @@ Ext.define('Kits.store.Order', {
             totalProperty: 'totalElements',
         }
     },
+    remoteSort: true,
     sorters: [{
         property: 'time',
         direction: 'DESC'
