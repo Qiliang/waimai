@@ -6,14 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
 public class ApiController {
 
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
+    private ShopRepository shopRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -26,8 +31,53 @@ public class ApiController {
 
     @GetMapping("/stat")
     public Object stat() {
-        return shopOrderRepository;
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderCount", shopOrderRepository.count());
+        result.put("riderCount", riderRepository.count());
+        result.put("shopCount", shopRepository.count());
+
+        long orderDqcCount = shopOrderRepository.count((root, query, builder) -> builder.equal(root.get("riderState"), "dqc"));
+        long orderPszCount = shopOrderRepository.count((root, query, builder) -> builder.equal(root.get("riderState"), "psz"));
+        long orderWcCount = shopOrderRepository.count((root, query, builder) -> builder.equal(root.get("riderState"), "wc"));
+        long orderYcCount = shopOrderRepository.count((root, query, builder) -> builder.equal(root.get("riderState"), "yc"));
+        result.put("orderDqcCount", orderDqcCount);
+        result.put("orderPszCount", orderPszCount);
+        result.put("orderWcCount", orderWcCount);
+        result.put("orderYcCount", orderYcCount);
+        Double orderCoast = (Double) em.createQuery("SELECT avg(riderCoast)FROM ShopOrder").getSingleResult();
+        result.put("orderCoast", (int) (orderCoast / 1000 / 60));
+        return result;
     }
+
+    @GetMapping({"/dailyOrders/stat"})
+    public Object dailyOrders() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        Date d = new Date();
+
+        String day = today.get(Calendar.YEAR) + "-" + (today.get(Calendar.MONTH) + 1) + "-" + today.get(Calendar.DAY_OF_MONTH);
+        List<Object[]> result = em.createNativeQuery("select HOUR(time) hour,count(*) orders from shop_order where time>'" + day + "' group by hour").getResultList();
+
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            final int huor = i;
+            Map<String, Object> huorOrders = new HashMap<>();
+            huorOrders.put("hour", i);
+            out.add(huorOrders);
+            Optional<Object[]> line = result.stream().filter(row -> ((int) row[0]) == huor).findFirst();
+            if (line.isPresent()) {
+                huorOrders.put("orders", line.get()[1]);
+            } else {
+                huorOrders.put("orders", 0);
+            }
+        }
+        return out;
+
+    }
+
 
 
     @GetMapping("/users")

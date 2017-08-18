@@ -27,27 +27,29 @@ Ext.define('Kits.view.Shop', {
 
             me.getStore().insert(0, rec);
         }
-    }, {
-        iconCls: 'x-fa fa-hand-paper-o',
-        text: '抓取数据',
-        handler: function () {
-            var grid = this.up('grid')
-            grid.mask('开启抓取工具，请耐心等待');
-            Ext.Ajax.request({
-                method: 'POST',
-                timeout: 2 * 60 * 1000,
-                url: '/meituan/spider/onAll',
-                success: function (response, opts) {
-                    grid.unmask();
-                    grid.getStore().load();
-                },
-                failure: function (response, opts) {
-                    grid.unmask();
-                    console.log('server-side failure with status code ' + response.status);
-                }
-            });
-        }
-    }],
+    }
+    //     {
+    //     iconCls: 'x-fa fa-hand-paper-o',
+    //     text: '抓取数据',
+    //     handler: function () {
+    //         var grid = this.up('grid')
+    //         grid.mask('开启抓取工具，请耐心等待');
+    //         Ext.Ajax.request({
+    //             method: 'POST',
+    //             timeout: 2 * 60 * 1000,
+    //             url: '/meituan/spider/onAll',
+    //             success: function (response, opts) {
+    //                 grid.unmask();
+    //                 grid.getStore().load();
+    //             },
+    //             failure: function (response, opts) {
+    //                 grid.unmask();
+    //                 console.log('server-side failure with status code ' + response.status);
+    //             }
+    //         });
+    //     }
+    // }
+    ],
     columns: [
         {
             text: 'id',

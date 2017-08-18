@@ -3,6 +3,7 @@ Ext.define('Kits.view.BMap', {
     alias: 'widget.bmap',
     requires: ['Ext.window.MessageBox'],
     // height: 250,
+
     html: '<div style="height: 900px" id="allmap"></div>',
     mQi: new BMap.Icon('/marker/Marker_qi.png', new BMap.Size(48, 48)),
     mQu: new BMap.Icon('/marker/Marker_qu.png', new BMap.Size(48, 48)),
@@ -93,14 +94,22 @@ Ext.define('Kits.view.BMap', {
         this.callParent(arguments);
 
         var me = this;
-        Ext.create('Kits.store.Rider', {
+        me.riderStore = Ext.create('Kits.store.Rider', {
             listeners: {
                 load: function (store, records, successful, operation, eOpts) {
                     if (!successful)return;
-                    console.log(records)
+                    if (me.riderMarkers) {
+                        for (var i = 0; i < me.riderMarkers.length; i++) {
+                            me.bmap.removeOverlay(me.riderMarkers[i]);
+                        }
+                    } else {
+                        me.riderMarkers = []
+                    }
                     Ext.each(records, function (rec) {
                         var lng = parseFloat(rec.get('lng')) / 1000000;
                         var lat = parseFloat(rec.get('lat')) / 1000000;
+                        lng += Ext.Number.randomInt(1, 10) / 1000.0;
+                        lat += Ext.Number.randomInt(1, 10) / 1000.0;
                         var riderId = rec.get("id");
                         var displayName = rec.get("displayName");
                         if (isNaN(lng) || isNaN(lat))return;
@@ -108,6 +117,7 @@ Ext.define('Kits.view.BMap', {
                         convertor.translate([new BMap.Point(lng, lat)], 3, 5, function (data) {
                             var label = new BMap.Label(rec.get('name'), {offset: new BMap.Size(20, -10)});
                             var marker = new BMap.Marker(data.points[0]);
+                            me.riderMarkers.push(marker);
                             marker.addEventListener("mouseover", me.markerMouseover.bind(marker));
                             marker.addEventListener("mouseout", me.markerMouseout.bind(marker));
                             marker.setIcon(me.mQi);
@@ -117,6 +127,7 @@ Ext.define('Kits.view.BMap', {
                             var markerMenu = new BMap.ContextMenu();
                             markerMenu.addItem(new BMap.MenuItem('指派',
                                 function () {
+                                console.log(riderId)
                                     me.asignToRider(riderId,displayName);
                                 }.bind(me)));
                             marker.addContextMenu(markerMenu);
@@ -127,6 +138,14 @@ Ext.define('Kits.view.BMap', {
             }
 
         });
+
+        me.riderTask = Ext.TaskManager.start({
+            run: function () {
+                me.riderStore.load();
+            },
+            interval: 5000
+        });
+
     }
 
 

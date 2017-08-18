@@ -30,9 +30,11 @@ public class ShopOrder extends JPAEntity {
     private String userName;
 
     private String userPhone;
-
+    @Lob
+    private String userPhoneImg;
     private String userAddress;
-
+    @Lob
+    private String userAddressImg;
     private String remark;
 
     private String shopLng;//经度
@@ -53,6 +55,7 @@ public class ShopOrder extends JPAEntity {
     private Date riderToUserTime;//骑手送达给客户的时间
     private String riderToUserLng;
     private String riderToUserLat;
+    private long riderCoast;//骑手订单耗时
     @Lob
     private String description;
 
@@ -76,6 +79,30 @@ public class ShopOrder extends JPAEntity {
 
     public void setRiderGetGoodsLng(String riderGetGoodsLng) {
         this.riderGetGoodsLng = riderGetGoodsLng;
+    }
+
+    public long getRiderCoast() {
+        return riderCoast;
+    }
+
+    public void setRiderCoast(long riderCoast) {
+        this.riderCoast = riderCoast;
+    }
+
+    public String getUserPhoneImg() {
+        return userPhoneImg;
+    }
+
+    public void setUserPhoneImg(String userPhoneImg) {
+        this.userPhoneImg = userPhoneImg;
+    }
+
+    public String getUserAddressImg() {
+        return userAddressImg;
+    }
+
+    public void setUserAddressImg(String userAddressImg) {
+        this.userAddressImg = userAddressImg;
     }
 
     public String getRiderGetGoodsLat() {

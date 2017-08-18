@@ -3,7 +3,7 @@ Ext.define('Kits.store.DailyOrder', {
     model: 'Kits.model.Order',
     proxy: {
         type: 'rest',
-        url: '/meituan/dailyOrders'
+        url: '/api/dailyOrders/stat'
     },
     autoLoad: true
 

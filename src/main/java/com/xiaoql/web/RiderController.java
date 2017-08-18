@@ -8,9 +8,11 @@ import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -138,12 +140,13 @@ public class RiderController {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
         }
-
+        Date now = new Date();
         ShopOrder shopOrder = shopOrderRepository.getOne(orderId);
         shopOrder.setRiderState("wc");
-        shopOrder.setRiderToUserTime(new Date());
+        shopOrder.setRiderToUserTime(now);
         shopOrder.setRiderToUserLng(lng);
         shopOrder.setRiderToUserLat(lat);
+        shopOrder.setRiderCoast(now.getTime() - shopOrder.getRiderAssignTime().getTime());
         shopOrderRepository.save(shopOrder);
         return new RestResponse();
     }

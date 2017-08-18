@@ -1,7 +1,6 @@
 package com.xiaoql.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xiaoql.SpringApplicationContextHolder;
 import com.xiaoql.domain.Shop;
 import com.xiaoql.domain.ShopOrder;
 import com.xiaoql.domain.ShopOrderRepository;
@@ -9,13 +8,12 @@ import com.xiaoql.domain.ShopRepository;
 import okhttp3.*;
 import okhttp3.RequestBody;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,11 +23,9 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/meituan/spider")
@@ -39,13 +35,14 @@ public class MeitunSpider {
     @Value("${phantomjs.path}")
     private String phantomjsPath;
 
+    @Value("${spider.enabled}")
+    private boolean spiderEnabled;
+
+
     private final Map<String, SimpleDriver> loginMap = new HashMap<>();
     public static final Map<String, SimpleDriver> DRIVERMAP = new HashMap<>();
 
     private String access_token = null;
-
-    @Autowired
-    private SpringApplicationContextHolder springApplicationContextHolder;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -188,7 +185,7 @@ public class MeitunSpider {
 
     @Scheduled(initialDelay = 20 * 1000, fixedDelay = 60 * 1000)
     public void logonSpider() {
-
+        if (!spiderEnabled) return;
         for (Shop shop : shopRepository.findAll()) {
             String shopId = shop.getId();
             executorService.execute(() -> logonShop(shopId));
@@ -205,6 +202,12 @@ public class MeitunSpider {
         driver.findElementByCssSelector("input.login__password").sendKeys(shop.getLoginPassword());
         sleep(1000);
         driver.findElementByCssSelector(".login__submit").click();
+        System.out.println(driver.findElementByCssSelector("#login-form").getText());
+        sleep(3000);
+        long timestamp = new Date().getTime();
+        driver.get("http://e.waimai.meituan.com/?time=" + timestamp + "#/v2/order/history");
+        sleep(1000);
+        driver.switchTo().frame("hashframe");
     }
 
     private void logonShop(String id) {
@@ -216,12 +219,13 @@ public class MeitunSpider {
         try {
             URI uri = new URI(driver.getCurrentUrl());
             if (StringUtils.isNotBlank(uri.getPath()) && uri.getPath().contains("order/history")) {
-                driver.switchTo().frame("hashframe");
                 Document mainDoc = Jsoup.parse(driver.findElementByCssSelector("body").getAttribute("innerHTML"));
-                if (mainDoc.select("#verify_img").size() > 0) {
+                if (mainDoc.select("#verify_img #verifyModal").size() > 0) {
                     logon(driver, shop);
                 }
-            } else {
+            } else if (StringUtils.isNotBlank(uri.getPath()) && uri.getPath().contains("logon")) {
+                logon(driver, shop);
+            } else if (uri.toString().equals("about:blank")) {
                 logon(driver, shop);
             }
             DRIVERMAP.put(id, driver);
@@ -232,11 +236,9 @@ public class MeitunSpider {
     }
 
 
-
-
     @Scheduled(initialDelay = 10000, fixedDelay = 4 * 60 * 1000)
     public void orderSpider() {
-
+        if (!spiderEnabled) return;
         for (Shop shop : shopRepository.findAll()) {
             String shopId = shop.getId();
             executorService.execute(() -> lookShopOrder(shopId));
@@ -244,6 +246,47 @@ public class MeitunSpider {
         }
 
     }
+
+    private List<Map<String, Object>> orders(SimpleDriver driver) {
+
+        String today = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+        driver.executeScript("$.get('/v2/order/history/r/query?getNewVo=1&wmOrderPayType=-2&wmOrderStatus=-2&sortField=1&startDate=" + today + "&endDate=" + today + "&lastLabel=&nextLabel=',function(data){window.orders=data})");
+        long total = 0;
+        while (total < 200 * 30) {
+            Map<String, Object> response = (Map<String, Object>) driver.executeScript("return window.orders");
+            if (response != null) {
+                if ((Long) response.get("code") != 0) {
+                    return null;
+                }
+                if (response.get("wmOrderList") instanceof List) {
+                    return (List<Map<String, Object>>) response.get("wmOrderList");
+                }
+
+                return new ArrayList<>();
+            }
+            sleep(200);
+            total += 200;
+        }
+        return new ArrayList<>();
+    }
+
+    private Map<String, Object> ordersImages(SimpleDriver driver, List<String> ids, String meiTuanShopId) {
+        try {
+            String orderInfos = "[" + StringUtils.join(ids.stream().map(s -> "{\"wmOrderViewId\":" + s + ",\"wmPoiId\":" + meiTuanShopId + ",\"logisticsStatus\":0,\"logisticsCode\":\"0000\"}").collect(Collectors.toList()), ",") + "]";
+            driver.executeScript("$.get('http://e.waimai.meituan.com/v2/order/history/r/getImageString?type=3&orderInfos=" + URLEncoder.encode(orderInfos, "utf-8") + "',function(data){window.ordersImages=data})");
+            long total = 0;
+            while (total < 200 * 30) {
+                Map<String, Object> response = (Map<String, Object>) driver.executeScript("return window.ordersImages");
+                if (response != null) return (Map<String, Object>) response.get("data");
+                sleep(200);
+                total += 200;
+            }
+            return new HashMap<>();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private void lookShopOrder(String id) {
         SimpleDriver driver = DRIVERMAP.get(id);
@@ -255,60 +298,88 @@ public class MeitunSpider {
         System.out.println(shop.getName());
         try {
             long timestamp = new Date().getTime();
-            driver.get("http://e.waimai.meituan.com/?time=" + timestamp + "#/v2/order/history");
-            sleep(1000);
-            driver.switchTo().frame("hashframe");
-            Actions actions = new Actions(driver);
-//            WebElement btnNext;
-//            do {
-                WebElement orderContent = driver.findElementByCssSelector("ul.J-order-list");
+//{"wmOrderViewId":13781271578824180,"wmPoiId":1378127,"logisticsStatus":0,"logisticsCode":"0000"}
+//            driver.executeScript("$.get('/v2/order/history/r/query?getNewVo=1&wmOrderPayType=-2&wmOrderStatus=-2&sortField=1&startDate=2017-08-17&endDate=2017-08-17&lastLabel=&nextLabel=',function(data){window.orders=data})");
+//            sleep(2000);
+//            Map<String, Object> response = (Map<String, Object>) driver.executeScript("return window.orders");
+//            System.out.println(response);
+//            List<Map<String, Object>> order = (List<Map<String, Object>>) response.get("wmOrderList");
 
-            Document ulDoc = Jsoup.parse(orderContent.getAttribute("innerHTML"));
-                if (ulDoc.select("#exception-pro").size() == 1) {
-                    System.out.println(ulDoc.select("#exception-pro").text());
-                    return;
+//            driver.get("http://e.waimai.meituan.com/?time=" + timestamp + "#/v2/order/history");
+//            sleep(1000);
+//            driver.switchTo().frame("hashframe");
+//            Actions actions = new Actions(driver);
+//                WebElement orderContent = driver.findElementByCssSelector("ul.J-order-list");
+//
+//            Document ulDoc = Jsoup.parse(orderContent.getAttribute("innerHTML"));
+//                if (ulDoc.select("#exception-pro").size() == 1) {
+//                    System.out.println(ulDoc.select("#exception-pro").text());
+//                    return;
+//                }
+            List<Map<String, Object>> orders = orders(driver);
+            while (orders == null) {
+                logon(driver, shop);
+                orders = orders(driver);
+            }
+            Map<String, Object> ordersImages = Collections.emptyMap();
+            while (!orders.isEmpty()) {
+                List<String> ids = orders.stream().map(item -> (String) item.get("wm_order_id_view_str")).collect(Collectors.toList());
+                ordersImages = ordersImages(driver, ids, orders.stream().map(item -> item.get("wm_poi_id")).findAny().get().toString());
+                if (ordersImages.keySet().stream().allMatch(key -> ids.contains(key))) {
+                    break;
                 }
+                sleep(200);
+            }
 
-                for (WebElement li : orderContent.findElements(By.cssSelector("li.order-list-item"))) {
 
-                    actions.moveToElement(li).build().perform();
-                    String orderId = li.getAttribute("id");
-                    Document liDoc = Jsoup.parse(li.getAttribute("outerHTML"));
+            for (Map<String, Object> item : orders) {
+                String orderId = (String) item.get("wm_order_id_view_str");
+                // Integer meiTuanShopId = (Integer) item.get("wm_poi_id");
+//                    actions.moveToElement(li).build().perform();
+//                    String orderId = li.getAttribute("id");
+//                    Document liDoc = Jsoup.parse(li.getAttribute("outerHTML"));
                     ShopOrder order = shopOrderRepository.findOne(orderId);
                     if (order == null) {
+//                        driver.executeScript("$.post('/v2/order/history/r/print/info/v2?wmOrderViewId=" + orderId + "&wmPoiId=" + meiTuanShopId + "&getNewVo=1',function(data){window.abc=data})");
+//                        sleep(2000);
+//                        Object response = driver.executeScript("return window.abc");
+
                         Date orderTime = new Date();
-                        orderTime.setTime(Long.valueOf(li.getAttribute("data-order-time")) * 1000);
+                        orderTime.setTime(Long.valueOf((Long) item.get("order_time")) * 1000);
                         order = new ShopOrder();
                         order.setShopId(shop.getId());
-                        order.setId(li.getAttribute("id"));
+                        order.setId(orderId);
                         order.setTime(orderTime);
-                        order.setDescription(li.findElement(By.cssSelector(".product-list")).getText());
+                        order.setDescription((String) item.get("orderCopyContent"));
                         order.setShopAddress(shop.getAddress());
                         order.setShopName(shop.getName());
                         order.setShopPhone(shop.getPhone());
-                        order.setRemark(remark(liDoc));
-                        order.setUserName(li.findElement(By.cssSelector("div.user-name")).getText());
-                        order.setState(li.findElement(By.cssSelector("div.order-state")).getText());
-                        order.setUserPhone(phone(liDoc));
-                        order.setUserAddress(address(liDoc));
-                        WebElement mapInfo = li.findElement(By.className("j-show-map"));
-                        order.setOrderLng(mapInfo.getAttribute("data-order-lng"));
-                        order.setOrderLat(mapInfo.getAttribute("data-order-lat"));
-                        order.setShopLng(mapInfo.getAttribute("data-poi-lng"));
-                        order.setShopLat(mapInfo.getAttribute("data-poi-lat"));
+                        order.setRemark(item.get("remark").toString());
+                        order.setUserName(item.get("recipient_name").toString());
+                        order.setState(item.get("status").toString());
+                        order.setUserPhone((String) item.get("recipient_bindedPhone"));
+                        Map<String, Object> images = (Map<String, Object>) ordersImages.get(orderId);
+                        order.setUserPhoneImg(images.get("recipient_phone").toString());
+                        order.setUserAddress((String) item.get("recipient_address"));
+                        order.setUserAddressImg(images.get("recipient_address").toString());
+                        // WebElement mapInfo = li.findElement(By.className("j-show-map"));
+                        order.setOrderLng(item.get("address_longitude").toString());
+                        order.setOrderLat(item.get("address_latitude").toString());
+                        order.setShopLng(item.get("poi_longitude").toString());
+                        order.setShopLat(item.get("poi_latitude").toString());
                     } else {
-                        order.setState(li.findElement(By.cssSelector("div.order-state")).getText());
+                        //order.setState(li.findElement(By.cssSelector("div.order-state")).getText());
                     }
+                if (StringUtils.isBlank(order.getUserAddress()) && StringUtils.isNotBlank(order.getUserAddressImg())) {
+                    order.setUserAddress(ocr(order.getUserAddressImg().substring(22)));
+                }
+                if (StringUtils.isBlank(order.getUserPhone()) && StringUtils.isNotBlank(order.getUserPhoneImg())) {
+                    order.setUserAddress(ocr(order.getUserAddressImg().substring(22)));
+                }
 
                     shopOrderRepository.saveAndFlush(order);
                 }
 
-//                btnNext = driver.findElementByCssSelector("button.J-next-page");
-//                actions.moveToElement(btnNext).build().perform();
-//                if (!btnNext.isEnabled()) continue;
-//                btnNext.click();
-//            }
-//            while (btnNext.isEnabled());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,6 +422,13 @@ public class MeitunSpider {
         }
     }
 
+    private String addressImg(Document liDoc) {
+        if (liDoc.select(".J-search-address img").size() > 0) {
+            return liDoc.select(".J-search-address img").attr("src");
+        }
+        return null;
+    }
+
     private String address(Document liDoc) {
         if (liDoc.getElementsByClass("J-search-address").hasText()) {
             return liDoc.getElementsByClass("J-search-address").text();
@@ -359,6 +437,15 @@ public class MeitunSpider {
             //String src = liDoc.getElementsByClass("J-search-address").get(0).getElementsByTag("img").get(0).attr("src");
             return ocr(src.substring(22));
         }
+    }
+
+    private String phoneImg(Document liDoc) {
+        if (liDoc.select(".J-user-phone img").size() > 0) {
+            return liDoc.select(".J-user-phone img").attr("src");
+        } else {
+            return null;
+        }
+
     }
 
     private String phone(Document liDoc) {

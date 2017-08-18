@@ -18,4 +18,6 @@ public interface ShopOrderRepository extends JpaRepository<ShopOrder, String>, J
 
     List<ShopOrder> findByRiderStateOrderByTimeDesc(String riderState);
 
+
+
 }

@@ -39,9 +39,21 @@ Ext.define('Kits.view.schedule.Dzp', {
                 }
             ],
             columns: [
-                {text: '订单地址', dataIndex: 'userAddress', flex: 1}
+                {
+                    text: '订单', dataIndex: 'description', flex: 1,
+                    // xtype: 'widgetcolumn', text: '订单地址', dataIndex: 'userAddress', flex: 1,
+                    // widget: {
+                    //     height: 24,
+                    //     xtype: 'image',
+                    //     bind: {src: '{record.userAddressImg}'}
+                    // },
+                    // renderer: function (value, metaData, record) {
+                    //     var userAddressImg = record.get('userAddressImg');
+                    //     return userAddressImg ? userAddressImg : record.get('userAddress');
+                    // }
+                }
             ],
-            width: 200,
+            width: 250,
             listeners: {
                 selectionchange: function (grid, selected, eOpts) {
                     var rec = selected[0];

@@ -12,6 +12,8 @@ Ext.define('Kits.model.Order', {
         {name: 'userName', type: 'string'},
         {name: 'userPhone', type: 'string'},
         {name: 'userAddress', type: 'string'},
+        {name: 'userPhoneImg', type: 'string'},
+        {name: 'userAddressImg', type: 'string'},
         {name: 'remark', type: 'string'},
         {name: 'shopLng', type: 'string'},
         {name: 'shopLat', type: 'string'},

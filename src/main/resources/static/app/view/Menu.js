@@ -25,29 +25,6 @@ Ext.define('Kits.view.Menu', {
                     leaf: true
                 },
                 {
-                    iconCls: 'x-fa fa-th',
-                    text: '数据',
-                    children: [
-                        {
-                            iconCls: 'x-fa fa-table',
-                            leaf: true,
-                            text: '运单数据',
-                            cmp: 'Kits.view.Order'
-                        },
-                        {
-                            iconCls: 'x-fa fa-table',
-                            leaf: true,
-                            text: '商家数据',
-                            cmp: 'Kits.view.Order'
-                        }, {
-                            iconCls: 'x-fa fa-table',
-                            leaf: true,
-                            text: '骑手数据',
-                            cmp: 'Kits.view.Order'
-                        }
-                    ]
-                },
-                {
                     iconCls: 'x-fa fa-shopping-cart',
                     text: '商家管理',
                     cmp: 'Kits.view.Shop',
@@ -105,14 +82,7 @@ Ext.define('Kits.view.Menu', {
                     text: '系统用户',
                     cmp: 'Kits.view.User',
                     leaf: true
-                },
-                {
-                    text: 'app',
-                    children: [
-                        {leaf: true, text: 'Application.js'}
-                    ]
                 }
-
 
             ]
         }
