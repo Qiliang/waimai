@@ -168,7 +168,7 @@ public class MeitunSpider {
         DRIVERMAP.put(id, loginMap.remove(id));
     }
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 60 * 60 * 1000)
+    //@Scheduled(initialDelay = 10000, fixedDelay = 60 * 60 * 1000)
     @Transactional
     public void baiduToken() throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -183,7 +183,7 @@ public class MeitunSpider {
     }
 
 
-    @Scheduled(initialDelay = 20 * 1000, fixedDelay = 60 * 1000)
+    //@Scheduled(initialDelay = 20 * 1000, fixedDelay = 60 * 1000)
     public void logonSpider() {
         if (!spiderEnabled) return;
         for (Shop shop : shopRepository.findAll()) {
@@ -236,7 +236,7 @@ public class MeitunSpider {
     }
 
 
-    @Scheduled(initialDelay = 10000, fixedDelay = 4 * 60 * 1000)
+   // @Scheduled(initialDelay = 10000, fixedDelay = 4 * 60 * 1000)
     public void orderSpider() {
         if (!spiderEnabled) return;
         for (Shop shop : shopRepository.findAll()) {

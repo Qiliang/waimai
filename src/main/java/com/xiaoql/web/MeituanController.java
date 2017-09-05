@@ -1,5 +1,7 @@
 package com.xiaoql.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +33,10 @@ public class MeituanController {
 
     @Autowired
     private ShopRepository shopRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
 
     @GetMapping({"/shops"})
@@ -80,6 +87,42 @@ public class MeituanController {
         today.set(Calendar.MILLISECOND, 0);
 
         return shopOrderRepository.findByTimeAfter(today.getTime());
+    }
+
+    @PostMapping({"/orders"})
+    @Transactional
+    public void orders(@RequestBody Map<String, Object> requestBody) throws JsonProcessingException {
+
+        Map<String, Object> body = (Map<String, Object>) ((List) requestBody.get("data")).get(0);
+
+        Date orderTime = new Date();
+        orderTime.setTime(Long.valueOf((Integer) body.get("order_time"))*1000);
+        ShopOrder order = new ShopOrder();
+        order.setShopId(body.get("wm_poi_id").toString());
+//        order.setId(body.get("id").toString());
+        order.setId(body.get("wm_order_id_view_str").toString());
+        order.setMeituanViewId(body.get("wm_order_id_view_str").toString());
+        order.setTime(orderTime);
+        order.setDescription(body.get("orderCopyContent").toString());
+        //order.setShopAddress(body.get("poi_name").toString());
+        order.setShopName(body.get("poi_name").toString());
+        //order.setShopPhone(shop.getPhone());
+        //order.setRemark(item.get("remark").toString());
+        order.setUserName(body.get("recipient_name").toString());
+        order.setState(body.get("pay_status").toString());
+        order.setUserPhone(body.get("recipient_phone").toString());
+        //Map<String, Object> images = (Map<String, Object>) ordersImages.get(orderId);
+        // order.setUserPhoneImg(images.get("recipient_phone").toString());
+        order.setUserAddress(body.get("recipient_address").toString());
+        //order.setUserAddressImg(images.get("recipient_address").toString());
+        // WebElement mapInfo = li.findElement(By.className("j-show-map"));
+        order.setOrderLng(body.get("address_longitude").toString());
+        order.setOrderLat(body.get("address_latitude").toString());
+        order.setShopLng(body.get("poi_longitude").toString());
+        order.setShopLat(body.get("poi_latitude").toString());
+        order.setRaw(objectMapper.writeValueAsString(body));
+        shopOrderRepository.saveAndFlush(order);
+
     }
 
     @GetMapping({"/orders"})

@@ -108,15 +108,16 @@ Ext.define('Kits.view.BMap', {
                     Ext.each(records, function (rec) {
                         var lng = parseFloat(rec.get('lng')) / 1000000;
                         var lat = parseFloat(rec.get('lat')) / 1000000;
-                        lng += Ext.Number.randomInt(1, 10) / 1000.0;
-                        lat += Ext.Number.randomInt(1, 10) / 1000.0;
+                        // lng += Ext.Number.randomInt(1, 10) / 1000.0;
+                        // lat += Ext.Number.randomInt(1, 10) / 1000.0;
                         var riderId = rec.get("id");
                         var displayName = rec.get("displayName");
                         if (isNaN(lng) || isNaN(lat))return;
                         var convertor = new BMap.Convertor();
-                        convertor.translate([new BMap.Point(lng, lat)], 3, 5, function (data) {
+                        //convertor.translate([new BMap.Point(lng, lat)], 3, 5, function (data) {
                             var label = new BMap.Label(rec.get('name'), {offset: new BMap.Size(20, -10)});
-                            var marker = new BMap.Marker(data.points[0]);
+                            // var marker = new BMap.Marker(data.points[0]);
+                            var marker = new BMap.Marker(new BMap.Point(lng, lat));
                             me.riderMarkers.push(marker);
                             marker.addEventListener("mouseover", me.markerMouseover.bind(marker));
                             marker.addEventListener("mouseout", me.markerMouseout.bind(marker));
@@ -131,7 +132,7 @@ Ext.define('Kits.view.BMap', {
                                     me.asignToRider(riderId,displayName);
                                 }.bind(me)));
                             marker.addContextMenu(markerMenu);
-                        });
+                        //});
 
                     })
                 }

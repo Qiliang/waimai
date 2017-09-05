@@ -14,6 +14,8 @@ public class ShopOrder extends JPAEntity {
     @Id
     private String id;
 
+    private String meituanViewId;
+
     private String shopId;
 
     private String shopName;
@@ -41,6 +43,8 @@ public class ShopOrder extends JPAEntity {
     private String shopLat;//纬度
     private String orderLng;
     private String orderLat;
+    @Lob
+    private String raw;
 
 
     @OneToOne()
@@ -64,6 +68,23 @@ public class ShopOrder extends JPAEntity {
 
     @LastModifiedDate
     private Date lastModifiedDate;
+
+
+    public String getRaw() {
+        return raw;
+    }
+
+    public void setRaw(String raw) {
+        this.raw = raw;
+    }
+
+    public String getMeituanViewId() {
+        return meituanViewId;
+    }
+
+    public void setMeituanViewId(String meituanViewId) {
+        this.meituanViewId = meituanViewId;
+    }
 
     public Date getRiderReadTime() {
         return riderReadTime;
