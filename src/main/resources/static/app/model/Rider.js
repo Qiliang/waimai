@@ -9,6 +9,7 @@ Ext.define('Kits.model.Rider', {
         {name: 'loginPassword', type: 'string'},
         {name: 'lng', type: 'string'},
         {name: 'lat', type: 'string'},
+        {name:'active',type:'boolean'},
         {name: 'lastModifyTime', type: 'date',dateFormat:'timestamp'},
         {
             name: 'displayName', type: 'string', persist: false,

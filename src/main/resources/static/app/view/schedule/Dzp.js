@@ -41,6 +41,12 @@ Ext.define('Kits.view.schedule.Dzp', {
             columns: [
                 {
                     text: '订单', dataIndex: 'description', flex: 1,
+                    renderer: function(value, metaData, record, rowIndex, colIndex, store, view){
+
+
+                        return '<div style="padding: 5px;"><span style="color:#4c82b1" class="fa fa-arrow-circle-left"></span>'+record.get('shopName')+'</div>'
+                              +'<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>'+ record.get('userAddress')+'</span></div>'
+                    }
                     // xtype: 'widgetcolumn', text: '订单地址', dataIndex: 'userAddress', flex: 1,
                     // widget: {
                     //     height: 24,
@@ -53,13 +59,16 @@ Ext.define('Kits.view.schedule.Dzp', {
                     // }
                 }
             ],
-            width: 250,
+            width: 350,
             listeners: {
                 selectionchange: function (grid, selected, eOpts) {
-                    var rec = selected[0];
+                    //var rec = selected[0];
                     var bMap = this.up('panel').down('bmap');
                     bMap.markerOrderClear();
-                    bMap.markerOrder(rec);
+                    bMap.markerOrder(selected);
+                },
+                afterrender:function (grid,eOpts) {
+                    grid.getSelectionModel().setSelectionMode('MULTI');
                 }
             }
         },
@@ -69,12 +78,12 @@ Ext.define('Kits.view.schedule.Dzp', {
                 var me = this.up('dzp');
                 var grid = me.down('grid[itemId=shopOrderGrid]');
                 if (!grid.getSelection() || grid.getSelection().length == 0)return;
-                var orderRecord = grid.getSelection()[0];
+                var orderRecords = grid.getSelection().map(function (item) {return item.get('id')}).join(",");
                 Ext.Msg.confirm('确认', '确认指派' + displayName + "?", function (r) {
                     if (r !== 'yes') return;
                     Ext.Ajax.request({
                         method: 'POST',
-                        url: '/meituan/orders/' + orderRecord.get('id') + '/asign/' + riderId,
+                        url: '/meituan/orders/' +orderRecords + '/asign/' + riderId,
                         success: function (response, opts) {
                             grid.getStore().load({
                                 scope: this,
@@ -92,34 +101,34 @@ Ext.define('Kits.view.schedule.Dzp', {
             },
             flex: 1
         },
-        {
-            xtype: 'grid',
-            store: Ext.create('Kits.store.Rider'),
-            tbar: [
-                {
-                    xtype: 'combo',
-                    emptyText: '输入骑手姓名筛选',
-                    store: Ext.create('Kits.store.Rider'),
-                    displayField: 'name',
-                    valueField: 'id',
-                    flex: 1
-                }
-            ],
-            tools: [
-                {
-                    type: 'refresh',
-                    tooltip: '刷新',
-                    callback: function (panel, tool, event) {
-                        panel.getStore().load();
-                    }
-                }
-            ],
-            columns: [
-                {text: '骑手姓名', dataIndex: 'name', flex: 1},
-                {text: '骑手电话', dataIndex: 'phone', flex: 1}
-            ],
-            width: 250
-        }
+        // {
+        //     xtype: 'grid',
+        //     store: Ext.create('Kits.store.Rider'),
+        //     tbar: [
+        //         {
+        //             xtype: 'combo',
+        //             emptyText: '输入骑手姓名筛选',
+        //             store: Ext.create('Kits.store.Rider'),
+        //             displayField: 'name',
+        //             valueField: 'id',
+        //             flex: 1
+        //         }
+        //     ],
+        //     tools: [
+        //         {
+        //             type: 'refresh',
+        //             tooltip: '刷新',
+        //             callback: function (panel, tool, event) {
+        //                 panel.getStore().load();
+        //             }
+        //         }
+        //     ],
+        //     columns: [
+        //         {text: '骑手姓名', dataIndex: 'name', flex: 1},
+        //         {text: '骑手电话', dataIndex: 'phone', flex: 1}
+        //     ],
+        //     width: 250
+        // }
     ],
 
     tbar: [

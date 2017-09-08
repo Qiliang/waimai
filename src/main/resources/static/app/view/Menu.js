@@ -3,7 +3,7 @@ Ext.define('Kits.view.Menu', {
     rootVisible: false,
     useArrows: true,
     id: 'mainMenu',
-    ui:'nav',
+    //ui:'nav',
     listeners: {
         selectionchange: function (me, selected, eOpts) {
             var center = Ext.getCmp('center');
@@ -23,6 +23,24 @@ Ext.define('Kits.view.Menu', {
                     text: '首页',
                     cmp: 'Kits.view.Home',
                     leaf: true
+                },
+                {
+                    iconCls: 'x-fa fa-bar-chart',
+                    text: '数据',
+                    cmp: 'Kits.view.data.Index',
+                    children: [
+                        {
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '商家数据',
+                            cmp: 'Kits.view.data.Shop'
+                        },{
+                            iconCls: 'x-fa fa-table',
+                            leaf: true,
+                            text: '骑手数据',
+                            cmp: 'Kits.view.data.Rider'
+                        }
+                        ]
                 },
                 {
                     iconCls: 'x-fa fa-shopping-cart',

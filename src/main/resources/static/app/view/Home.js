@@ -18,10 +18,13 @@ Ext.define('Kits.view.Home', {
 
     stat: function () {
         var me = this;
+        me.mask('正在统计，请耐心等待');
         Ext.Ajax.request({
             method: 'GET',
             url: '/api/stat/',
             success: function (response, opts) {
+                if (!me.rendered)return;
+                me.unmask();
                 var stat = Ext.decode(response.responseText);
                 var shopPanel = me.down('panel[itemId=shop]');
                 shopPanel.removeAll();
@@ -104,6 +107,7 @@ Ext.define('Kits.view.Home', {
 
             },
             failure: function (response, opts) {
+                me.unmask();
                 console.log('server-side failure with status code ' + response.status);
             }
         });
@@ -122,6 +126,16 @@ Ext.define('Kits.view.Home', {
                 type: 'hbox',
                 align: 'stretch'
             },
+            defaults:{
+                items:{
+                    xtype: 'button',
+                    iconCls: 'fa fa-home',
+                    text: '正在加载...',
+                    iconAlign: 'top',
+                    width: 200,
+                    height: 200
+                }
+            },
             items: [
                 {layout: 'center', itemId: 'shop', flex: 1},
                 {layout: 'center', itemId: 'order', flex: 1},
@@ -134,6 +148,14 @@ Ext.define('Kits.view.Home', {
             layout: {
                 type: 'hbox',
                 align: 'stretch'
+            },
+            defaults:{
+                items:{
+                    xtype: 'button',
+                    text: '正在加载...',
+                    width: 200,
+                    height: 200
+                }
             },
             items: [
                 {itemId: 'dzp', flex: 1},

@@ -42,43 +42,48 @@ Ext.define('Kits.view.BMap', {
         }
     },
 
-    markerOrder: function (rec) {
-        if (!rec)return;
+    markerOrder: function (recs) {
+        if (!recs)return;
         var me = this;
-        var orderLng = parseFloat(rec.get('orderLng')) / 1000000;
-        var orderLat = parseFloat(rec.get('orderLat')) / 1000000;
-        var shopLng = parseFloat(rec.get('shopLng')) / 1000000;
-        var shopLat = parseFloat(rec.get('shopLat')) / 1000000;
-        var convertor = new BMap.Convertor();
-        me.orderMarkers = [];
-        convertor.translate([new BMap.Point(orderLng, orderLat), new BMap.Point(shopLng, shopLat)], 3, 5, function (data) {
+        //var mapcenter = null;
+        Ext.Array.each(recs, function (rec, index) {
+            var orderLng = parseFloat(rec.get('orderLng')) / 1000000;
+            var orderLat = parseFloat(rec.get('orderLat')) / 1000000;
+            var shopLng = parseFloat(rec.get('shopLng')) / 1000000;
+            var shopLat = parseFloat(rec.get('shopLat')) / 1000000;
+            var convertor = new BMap.Convertor();
+            me.orderMarkers = [];
+            convertor.translate([new BMap.Point(orderLng, orderLat), new BMap.Point(shopLng, shopLat)], 3, 5, function (data) {
 
-            var markerSong = new BMap.Marker(data.points[0]);
-            me.orderMarkers.push(markerSong);
-            markerSong.setIcon(me.mSong);
-            me.bmap.addOverlay(markerSong);
-            markerSong.setLabel(new BMap.Label(rec.get('userAddress'), {offset: new BMap.Size(20, -10)}));
-            markerSong.addEventListener("mouseover", me.markerMouseover.bind(markerSong));
-            markerSong.addEventListener("mouseout", me.markerMouseout.bind(markerSong));
+                var markerSong = new BMap.Marker(data.points[0]);
+                me.orderMarkers.push(markerSong);
+                markerSong.setIcon(me.mSong);
+                me.bmap.addOverlay(markerSong);
+                markerSong.setLabel(new BMap.Label(rec.get('userAddress'), {offset: new BMap.Size(20, -10)}));
+                markerSong.addEventListener("mouseover", me.markerMouseover.bind(markerSong));
+                markerSong.addEventListener("mouseout", me.markerMouseout.bind(markerSong));
 
 
-            var markerQu = new BMap.Marker(data.points[1]);
-            me.orderMarkers.push(markerQu);
-            markerQu.setIcon(me.mQu);
-            me.bmap.addOverlay(markerQu);
-            markerQu.setLabel(new BMap.Label(rec.get('shopName'), {offset: new BMap.Size(20, -10)}));
-            markerQu.addEventListener("mouseover", me.markerMouseover.bind(markerQu));
-            markerQu.addEventListener("mouseout", me.markerMouseout.bind(markerQu));
+                var markerQu = new BMap.Marker(data.points[1]);
+                me.orderMarkers.push(markerQu);
+                markerQu.setIcon(me.mQu);
+                me.bmap.addOverlay(markerQu);
+                markerQu.setLabel(new BMap.Label(rec.get('shopName'), {offset: new BMap.Size(20, -10)}));
+                markerQu.addEventListener("mouseover", me.markerMouseover.bind(markerQu));
+                markerQu.addEventListener("mouseout", me.markerMouseout.bind(markerQu));
 
-            me.bmap.panTo(data.points[0]);
-            var line = new BMap.Polyline(data.points);
-            me.orderMarkers.push(line);
-            line.setStrokeOpacity(0.5);
-            line.setStrokeStyle("dashed");
-            me.bmap.addOverlay(line);
 
+                var line = new BMap.Polyline(data.points);
+                me.orderMarkers.push(line);
+                line.setStrokeOpacity(0.5);
+                line.setStrokeStyle("dashed");
+                me.bmap.addOverlay(line);
+                if (!me.mapcenter) me.mapcenter = data.points[0];
+                console.log(me.mapcenter)
+            });
         });
 
+        me.bmap.panTo(me.mapcenter);
 
     },
 
@@ -110,6 +115,7 @@ Ext.define('Kits.view.BMap', {
                         var lat = parseFloat(rec.get('lat')) / 1000000;
                         // lng += Ext.Number.randomInt(1, 10) / 1000.0;
                         // lat += Ext.Number.randomInt(1, 10) / 1000.0;
+                        if(!rec.get('active'))return;
                         var riderId = rec.get("id");
                         var displayName = rec.get("displayName");
                         if (isNaN(lng) || isNaN(lat))return;

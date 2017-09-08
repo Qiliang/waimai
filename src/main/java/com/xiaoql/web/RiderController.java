@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
@@ -41,6 +42,7 @@ public class RiderController {
      * 骑手登录
      */
     @PostMapping("/token")
+    @Transactional
     public Map<String, Object> login(String username, String password) {
         Rider rider = riderRepository.findByLoginNameAndLoginPassword(username, password);
         Map<String, Object> json = new HashMap<>();
@@ -53,6 +55,7 @@ public class RiderController {
      * 骑手开启、关闭接单
      */
     @PostMapping("/active")
+    @Transactional
     public Object active(String token, boolean active, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -69,6 +72,7 @@ public class RiderController {
      * 骑手位置发送
      */
     @PostMapping("/position")
+    @Transactional
     public Object position(String token, String lng, String lat, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -85,6 +89,7 @@ public class RiderController {
      * 骑手的订单
      */
     @PostMapping("/orders")
+    @Transactional
     public Object orders(String token, String riderState,
                          @PageableParam(size = 50, page = 1, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable,
                          HttpServletResponse response) {
@@ -101,6 +106,7 @@ public class RiderController {
      * 骑手的订单阅读时间
      */
     @PostMapping("/orders/read")
+    @Transactional
     public Object ordersNews(@RequestParam String orderId,@RequestParam String token, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -116,6 +122,7 @@ public class RiderController {
      * 骑手取单
      */
     @PostMapping("/orders/got")
+    @Transactional
     public Object gotGoods(@RequestParam String orderId,@RequestParam String token,@RequestParam String lng,@RequestParam String lat, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -135,6 +142,7 @@ public class RiderController {
      * 骑手完成订单
      */
     @PostMapping("/orders/toUser")
+    @Transactional
     public Object toUser(@RequestParam String orderId,@RequestParam String token,@RequestParam String lng,@RequestParam String lat, HttpServletResponse response) {
         if (!riderRepository.exists(token)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

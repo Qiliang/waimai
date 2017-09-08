@@ -1,13 +1,20 @@
 package com.xiaoql.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.cfg.NamingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -16,6 +23,9 @@ public class ApiController {
 
     @Autowired
     private EntityManager em;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private ShopRepository shopRepository;
@@ -28,6 +38,12 @@ public class ApiController {
 
     @Autowired
     private RiderRepository riderRepository;
+
+    private ObjectMapper objectMapper=new ObjectMapper();
+
+    public ApiController() {
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE);
+    }
 
     @GetMapping("/stat")
     public Object stat() {
@@ -46,6 +62,49 @@ public class ApiController {
         result.put("orderYcCount", orderYcCount);
         Double orderCoast = (Double) em.createQuery("SELECT avg(riderCoast)FROM ShopOrder").getSingleResult();
         result.put("orderCoast", (int) (orderCoast / 1000 / 60));
+        return result;
+    }
+
+    @PostMapping("/stat/days")
+    public Object statDay() throws ParseException {
+        return  jdbcTemplate.queryForList("select DATE_FORMAT(time,'%Y-%m-%d') as d,count(*) count from shop_order group by d ORDER BY d desc LIMIT 0,30");
+    }
+
+    @PostMapping("/stat/riders")
+    public Object statRiders(@RequestParam String from, @RequestParam String to) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
+
+        List<Object[]> result = em.createNativeQuery("select rider_id,num,price,name,phone " +
+                "from (select rider_id,count(id) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' group by rider_id) a INNER JOIN rider b on a.rider_id=b.id").getResultList();
+
+        return result;
+    }
+
+    @PostMapping("/stat/rider")
+    public Object statRider(@RequestParam String from, @RequestParam String to, @RequestParam String token, @RequestParam String state) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
+
+        Map<String, Object> result =jdbcTemplate.queryForMap("select count(id) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "'");
+
+        return result;
+    }
+
+    @PostMapping("/stat/rider/details")
+    public Object statRiderDetails(@RequestParam String from, @RequestParam String to, @RequestParam String token, @RequestParam String state) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
+        List<Map<String, Object>> result = jdbcTemplate.queryForList("select id,rider_id riderId,shop_name shopName,shop_address shopAddress,user_name userName,user_address userAddress,time,rider_assign_time riderAssignTime,rider_get_goods_time riderGetGoodsTime,rider_to_user_time riderToUserTime from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "'");
+        return result;
+    }
+
+    @PostMapping("/stat/shops")
+    public Object statShop(@RequestParam String from, @RequestParam String to) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
+        List<Object[]> result = em.createNativeQuery("select shop_name,count(shop_name) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' group by shop_name").getResultList();
+
         return result;
     }
 

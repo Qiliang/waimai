@@ -11,6 +11,32 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class ShopOrder extends JPAEntity {
 
+
+    public ShopOrder() {
+    }
+
+    public ShopOrder(String id, String meituanViewId, String shopId, String shopName, String shopAddress, String shopPhone, Date time, String stime, String state, String userName, String userPhone, String userAddress, String remark, String shopLng, String shopLat, String orderLng, String orderLat, String description,double totalAfter) {
+        this.id = id;
+        this.meituanViewId = meituanViewId;
+        this.shopId = shopId;
+        this.shopName = shopName;
+        this.shopAddress = shopAddress;
+        this.shopPhone = shopPhone;
+        this.time = time;
+        this.stime = stime;
+        this.state = state;
+        this.userName = userName;
+        this.userPhone = userPhone;
+        this.userAddress = userAddress;
+        this.remark = remark;
+        this.shopLng = shopLng;
+        this.shopLat = shopLat;
+        this.orderLng = orderLng;
+        this.orderLat = orderLat;
+        this.description = description;
+        this.totalAfter=totalAfter;
+    }
+
     @Id
     private String id;
 
@@ -46,6 +72,7 @@ public class ShopOrder extends JPAEntity {
     @Lob
     private String raw;
 
+    private double totalAfter;
 
     @OneToOne()
     @JoinColumn()
@@ -69,6 +96,14 @@ public class ShopOrder extends JPAEntity {
     @LastModifiedDate
     private Date lastModifiedDate;
 
+
+    public double getTotalAfter() {
+        return totalAfter;
+    }
+
+    public void setTotalAfter(double totalAfter) {
+        this.totalAfter = totalAfter;
+    }
 
     public String getRaw() {
         return raw;
