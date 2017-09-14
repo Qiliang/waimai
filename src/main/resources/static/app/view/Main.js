@@ -15,10 +15,36 @@ Ext.define('Kits.view.Main', {
     },
     listeners: {
         afterRender: function (me, eOpts) {
-            var menu = Ext.ComponentQuery.query('#mainMenu')[0];
-            menu.setSelection(menu.getStore().getAt(0))
+            //var menu = Ext.ComponentQuery.query('#mainMenu')[0];
+            //menu.setSelection(menu.getStore().getAt(0))
             //menu.setSelection();
-            console.log(menu)
+            //console.log(menu)
+            var task = {
+                run: function () {
+                    var dt = Ext.Date.subtract(new Date(), Ext.Date.SECOND, 10);
+
+                    Ext.Ajax.request({
+                        method: 'POST',
+                        url: '/api/orders/alert',
+                        params: {
+                            time: Ext.Date.format(dt, 'Y-m-d H:i:s')
+                        },
+                        callback: function (options, success, response) {
+                            if (!success)return;
+                            var result = Ext.JSON.decode(response.responseText);
+                            if (result.alert) {
+                                Ext.toast({
+                                    html: '您有新的订单待分配',
+                                    align: 't'
+                                });
+                            }
+
+                        }
+                    });
+                },
+                interval: 10000
+            };
+            Ext.TaskManager.start(task);
         }
     },
 

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.xiaoql.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.cfg.NamingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,11 +39,27 @@ public class ApiController {
     @Autowired
     private RiderRepository riderRepository;
 
+    @Autowired
+    private AppVersionRepository appVersionRepository;
+
     private ObjectMapper objectMapper=new ObjectMapper();
 
     public ApiController() {
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE);
     }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+        User user = userRepository.findByLoginName(username);
+        if (user != null && user.getLoginPassword().equals(password)) {
+            return user.getId();
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            return "用户名或密码不正确";
+        }
+    }
+
+
 
     @GetMapping("/stat")
     public Object stat() {
@@ -81,21 +97,21 @@ public class ApiController {
         return result;
     }
 
-    @PostMapping("/stat/rider")
+    @PostMapping("/rider/stat")
     public Object statRider(@RequestParam String from, @RequestParam String to, @RequestParam String token, @RequestParam String state) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
 
-        Map<String, Object> result =jdbcTemplate.queryForMap("select count(id) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "'");
+        Map<String, Object> result = jdbcTemplate.queryForMap("select count(id) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "' order by time desc");
 
         return result;
     }
 
-    @PostMapping("/stat/rider/details")
+    @PostMapping("/rider/stat/details")
     public Object statRiderDetails(@RequestParam String from, @RequestParam String to, @RequestParam String token, @RequestParam String state) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
-        List<Map<String, Object>> result = jdbcTemplate.queryForList("select id,rider_id riderId,shop_name shopName,shop_address shopAddress,user_name userName,user_address userAddress,time,rider_assign_time riderAssignTime,rider_get_goods_time riderGetGoodsTime,rider_to_user_time riderToUserTime from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "'");
+        List<Map<String, Object>> result = jdbcTemplate.queryForList("select id,rider_id riderId,shop_name shopName,shop_address shopAddress,user_name userName,user_address userAddress,time,rider_assign_time riderAssignTime,rider_get_goods_time riderGetGoodsTime,rider_to_user_time riderToUserTime from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "' order by time desc");
         return result;
     }
 
@@ -148,7 +164,7 @@ public class ApiController {
     public void users(@PathVariable String id, @RequestBody Map<String, Object> toUser, HttpServletResponse response) {
         if (toUser.get("loginName") != null
                 && StringUtils.isNotBlank(toUser.get("loginName").toString())
-                && userRepository.findByLoginName(toUser.get("loginName").toString()).size() > 0) {
+                && userRepository.findByLoginName(toUser.get("loginName").toString()) != null) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return;
         }
@@ -160,7 +176,7 @@ public class ApiController {
 
     @PostMapping("/users")
     public Object users(@RequestBody User toUser, HttpServletResponse response) {
-        if (userRepository.findByLoginName(toUser.getLoginName()).size() > 0) {
+        if (userRepository.findByLoginName(toUser.getLoginName()) != null) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return new RestResponse(true, "登录名重复");
         }
@@ -218,5 +234,26 @@ public class ApiController {
         riderRepository.delete(id);
         return new RestResponse();
     }
+
+
+    //app升级
+    @GetMapping({"/checkupdate"})
+    @ResponseBody
+    public Object update() {
+        return appVersionRepository.findAll().stream().filter(v->v.getStatus()==1).findFirst().get();
+    }
+
+    /**
+     * 新订单提醒
+     */
+    @PostMapping("/orders/alert")
+    public Object alert(@RequestParam String time) {
+
+        List list = jdbcTemplate.queryForList("select id from shop_order where time>'" + time + "' limit 0,1");
+        Map<String, Object> map = new HashMap<>();
+        map.put("alert", list.size() > 0);
+        return map;
+    }
+
 
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/rider")
 public class RiderController {
 
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private RiderRepository riderRepository;
@@ -43,11 +44,15 @@ public class RiderController {
      */
     @PostMapping("/token")
     @Transactional
-    public Map<String, Object> login(String username, String password) {
+    public Map<String, Object> login(String username, String password, HttpServletResponse response) {
         Rider rider = riderRepository.findByLoginNameAndLoginPassword(username, password);
         Map<String, Object> json = new HashMap<>();
-        json.put("token", rider.getId());
-        json.put("name", rider.getName());
+        if (rider == null) {
+            json.put("message", "用户名或密码错误");
+        } else {
+            json.put("token", rider.getId());
+            json.put("name", rider.getName());
+        }
         return json;
     }
 
@@ -157,6 +162,22 @@ public class RiderController {
         shopOrder.setRiderCoast(now.getTime() - shopOrder.getRiderAssignTime().getTime());
         shopOrderRepository.save(shopOrder);
         return new RestResponse();
+    }
+
+    /**
+     * 骑手新订单提醒
+     */
+    @PostMapping("/orders/alert")
+    public Object alert(@RequestParam String token, @RequestParam String time, HttpServletResponse response) {
+        if (!riderRepository.exists(token)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return new RestResponse(true, "骑手未登录");
+        }
+
+        List list = jdbcTemplate.queryForList("select id from shop_order where rider_id='" + token + "' and rider_state='dqc' and rider_assign_time>'" + time + "' limit 0,1");
+        Map<String, Object> map = new HashMap<>();
+        map.put("alert", list.size() > 0);
+        return map;
     }
 
 

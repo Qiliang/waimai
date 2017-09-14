@@ -5,7 +5,8 @@ Ext.define('Kits.Application', {
     requires: [
         'Kits.override.ProxyServer',
         'Kits.override.Sorter',
-        'Kits.view.Main'
+        'Kits.view.Main',
+        'Kits.view.Login'
     ],
 
     // controllers: [
@@ -22,13 +23,19 @@ Ext.define('Kits.Application', {
     },
 
     launch: function () {
-        var view = 'Kits.view.Main';
-        if (/[?&]solo\b/.test(location.search)) {
-            view = 'Kits.view.main.Solo'
+
+        var token = Ext.util.Cookies.get('token');
+        if(token){
+            this.setMainView({
+                xclass: 'Kits.view.Main'
+            });
+        }else{
+            this.setMainView({
+                xclass: 'Kits.view.Login'
+            });
         }
-        this.setMainView({
-            xclass: view
-        });
+
+
     }
 }, function () {
     Kits.toast = function (title) {

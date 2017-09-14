@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface UserRepository extends JpaRepository<User, String> {
+public interface AppVersionRepository extends JpaRepository<AppVersion, String> {
 
-       User findByLoginName(String loginName);
+
 
 }
