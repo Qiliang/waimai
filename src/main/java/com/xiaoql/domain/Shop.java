@@ -29,6 +29,8 @@ public class Shop extends JPAEntity {
     private String loginName;
     private String loginPassword;
 
+    private double mpt;
+
     @Transient
     private boolean stealing;
     @CreatedDate
@@ -115,5 +117,14 @@ public class Shop extends JPAEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+
+    public double getMpt() {
+        return mpt;
+    }
+
+    public void setMpt(double mpt) {
+        this.mpt = mpt;
     }
 }

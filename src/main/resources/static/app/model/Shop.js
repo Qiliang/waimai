@@ -8,6 +8,6 @@ Ext.define('Kits.model.Shop', {
         {name: 'address', type: 'string'},
         {name: 'loginName', type: 'string'},
         {name: 'loginPassword', type: 'string'},
-        {name: 'stealing', type: 'boolean'}
+        {name: 'mpt', type: 'float'}
     ]
 })

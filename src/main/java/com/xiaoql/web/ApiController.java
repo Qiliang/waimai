@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -83,16 +82,23 @@ public class ApiController {
 
     @PostMapping("/stat/days")
     public Object statDay() throws ParseException {
-        return  jdbcTemplate.queryForList("select DATE_FORMAT(time,'%Y-%m-%d') as d,count(*) count from shop_order group by d ORDER BY d desc LIMIT 0,30");
+        List list = jdbcTemplate.queryForList("select DATE_FORMAT(time,'%Y-%m-%d') as d,count(*) count from shop_order group by d ORDER BY d desc LIMIT 0,30");
+        Collections.reverse(list);
+        return list;
+    }
+
+    @PostMapping("/stat/days/riders/{riderId}")
+    public Object statRiderDay(@PathVariable String riderId, @RequestParam String from, @RequestParam String to, @RequestParam String state) throws ParseException {
+        return jdbcTemplate.queryForList("select DATE_FORMAT(time,'%Y-%m-%d') as d,count(*) count,sum(mpt) rprice from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + riderId + "' and rider_state='" + state + "'  group by d ORDER BY d desc LIMIT 0,30");
     }
 
     @PostMapping("/stat/riders")
-    public Object statRiders(@RequestParam String from, @RequestParam String to) throws ParseException {
+    public Object statRiders(@RequestParam String from, @RequestParam String to, @RequestParam String state) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
 
-        List<Object[]> result = em.createNativeQuery("select rider_id,num,price,name,phone " +
-                "from (select rider_id,count(id) num,sum(total_after) price from shop_order where time>'" + from + "' and time<'" + to + "' group by rider_id) a INNER JOIN rider b on a.rider_id=b.id").getResultList();
+        List<Object[]> result = em.createNativeQuery("select rider_id,num,price,rprice,name,phone " +
+                "from (select rider_id,count(id) num,sum(total_after) price ,sum(mpt) rprice from shop_order where time>'" + from + "' and time<'" + to + "' and rider_state='" + state + "' group by rider_id) a INNER JOIN rider b on a.rider_id=b.id").getResultList();
 
         return result;
     }
@@ -111,7 +117,7 @@ public class ApiController {
     public Object statRiderDetails(@RequestParam String from, @RequestParam String to, @RequestParam String token, @RequestParam String state) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
-        List<Map<String, Object>> result = jdbcTemplate.queryForList("select id,rider_id riderId,shop_name shopName,shop_address shopAddress,user_name userName,user_address userAddress,time,rider_assign_time riderAssignTime,rider_get_goods_time riderGetGoodsTime,rider_to_user_time riderToUserTime from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "' order by time desc");
+        List<Map<String, Object>> result = jdbcTemplate.queryForList("select id,rider_id riderId,shop_name shopName,shop_address shopAddress,user_name userName,user_address userAddress,time,rider_assign_time riderAssignTime,rider_get_goods_time riderGetGoodsTime,rider_to_user_time riderToUserTime,total_after,mpt from shop_order where time>'" + from + "' and time<'" + to + "' and rider_id='" + token + "' and rider_state='" + state + "' order by time desc");
         return result;
     }
 

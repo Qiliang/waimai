@@ -13,10 +13,10 @@ public interface ShopOrderRepository extends JpaRepository<ShopOrder, String>, J
 
     List<ShopOrder> findByTimeAfter(Date date);
 
-    @Query(value = "SELECT new ShopOrder(a.id,a.meituanViewId,a.shopId,a.shopName,a.shopAddress,a.shopPhone,a.time,a.stime,a.state,a.userName,a.userPhone,a.userAddress,a.remark,a.shopLng,a.shopLat,a.orderLng,a.orderLat,a.description,a.totalAfter) from ShopOrder a where  a.rider.id=?1 and a.riderState=?2 order by a.time desc")
+    @Query(value = "SELECT new ShopOrder(a.id,a.meituanViewId,a.shopId,a.shopName,a.shopAddress,a.shopPhone,a.time,a.state,a.userName,a.userPhone,a.userAddress,a.remark,a.shopLng,a.shopLat,a.orderLng,a.orderLat,a.totalAfter,a.riderState,a.riderAssignTime,a.riderReadTime,a.riderGetGoodsTime,a.riderGetGoodsLng,a.riderGetGoodsLat,a.riderToUserTime,a.riderToUserLng,a.riderToUserLat,a.riderCoast,a.description) from ShopOrder a where  a.rider.id=?1 and a.riderState=?2 order by a.time desc")
     Page<ShopOrder> findByRiderIdAndRiderState(String riderId, String riderState, Pageable pageable);
 
-    @Query(value = "SELECT new ShopOrder(a.id,a.meituanViewId,a.shopId,a.shopName,a.shopAddress,a.shopPhone,a.time,a.stime,a.state,a.userName,a.userPhone,a.userAddress,a.remark,a.shopLng,a.shopLat,a.orderLng,a.orderLat,a.description,a.totalAfter) from ShopOrder a where  a.rider is null order by a.time desc")
+    @Query(value = "SELECT new ShopOrder(a.id,a.meituanViewId,a.shopId,a.shopName,a.shopAddress,a.shopPhone,a.time,a.state,a.userName,a.userPhone,a.userAddress,a.remark,a.shopLng,a.shopLat,a.orderLng,a.orderLat,a.totalAfter,a.riderState,a.riderAssignTime,a.riderReadTime,a.riderGetGoodsTime,a.riderGetGoodsLng,a.riderGetGoodsLat,a.riderToUserTime,a.riderToUserLng,a.riderToUserLat,a.riderCoast,a.description) from ShopOrder a where  a.rider is null order by a.time desc")
     List<ShopOrder> findByRiderIdIsNullOrderByTimeDesc(Pageable pageable);
 
     List<ShopOrder> findByRiderStateOrderByTimeDesc(String riderState);

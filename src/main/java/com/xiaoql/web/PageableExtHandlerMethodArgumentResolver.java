@@ -15,6 +15,6 @@ public class PageableExtHandlerMethodArgumentResolver extends PageableHandlerMet
     public Pageable resolveArgument(MethodParameter methodParameter, ModelAndViewContainer mavContainer,
                                     NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         Pageable pageable = super.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
-        return new PageRequest(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+        return new PageRequest(pageable.getPageNumber() == 0 ? 0 : pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
     }
 }

@@ -90,7 +90,6 @@ public class MeituanController {
     @PostMapping({"/orders"})
     @Transactional
     public void orders(@RequestBody Map<String, Object> requestBody) throws JsonProcessingException {
-
         Map<String, Object> body = (Map<String, Object>) ((List) requestBody.get("data")).get(0);
 
         Date orderTime = new Date();
@@ -125,6 +124,7 @@ public class MeituanController {
         if (shop.isPresent()) {
             order.setShopPhone(shop.get().getPhone());
             order.setShopAddress(shop.get().getAddress());
+            order.setMpt(shop.get().getMpt());
             shopOrderRepository.saveAndFlush(order);
         }
 

@@ -15,7 +15,8 @@ public class ShopOrder extends JPAEntity {
     public ShopOrder() {
     }
 
-    public ShopOrder(String id, String meituanViewId, String shopId, String shopName, String shopAddress, String shopPhone, Date time, String stime, String state, String userName, String userPhone, String userAddress, String remark, String shopLng, String shopLat, String orderLng, String orderLat, String description,double totalAfter) {
+
+    public ShopOrder(String id, String meituanViewId, String shopId, String shopName, String shopAddress, String shopPhone, Date time, String state, String userName, String userPhone, String userAddress, String remark, String shopLng, String shopLat, String orderLng, String orderLat, double totalAfter, String riderState, Date riderAssignTime, Date riderReadTime, Date riderGetGoodsTime, String riderGetGoodsLng, String riderGetGoodsLat, Date riderToUserTime, String riderToUserLng, String riderToUserLat, long riderCoast, String description) {
         this.id = id;
         this.meituanViewId = meituanViewId;
         this.shopId = shopId;
@@ -23,7 +24,6 @@ public class ShopOrder extends JPAEntity {
         this.shopAddress = shopAddress;
         this.shopPhone = shopPhone;
         this.time = time;
-        this.stime = stime;
         this.state = state;
         this.userName = userName;
         this.userPhone = userPhone;
@@ -33,9 +33,20 @@ public class ShopOrder extends JPAEntity {
         this.shopLat = shopLat;
         this.orderLng = orderLng;
         this.orderLat = orderLat;
+        this.totalAfter = totalAfter;
+        this.riderState = riderState;
+        this.riderAssignTime = riderAssignTime;
+        this.riderReadTime = riderReadTime;
+        this.riderGetGoodsTime = riderGetGoodsTime;
+        this.riderGetGoodsLng = riderGetGoodsLng;
+        this.riderGetGoodsLat = riderGetGoodsLat;
+        this.riderToUserTime = riderToUserTime;
+        this.riderToUserLng = riderToUserLng;
+        this.riderToUserLat = riderToUserLat;
+        this.riderCoast = riderCoast;
         this.description = description;
-        this.totalAfter=totalAfter;
     }
+
 
     @Id
     private String id;
@@ -73,7 +84,7 @@ public class ShopOrder extends JPAEntity {
     private String raw;
 
     private double totalAfter;
-
+    private double mpt;
     @OneToOne()
     @JoinColumn()
     private Rider rider;
@@ -375,5 +386,13 @@ public class ShopOrder extends JPAEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public double getMpt() {
+        return mpt;
+    }
+
+    public void setMpt(double mpt) {
+        this.mpt = mpt;
     }
 }
