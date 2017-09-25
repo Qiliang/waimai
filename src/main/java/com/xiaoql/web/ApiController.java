@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -202,7 +203,21 @@ public class ApiController {
         if (active == null)
         return riderRepository.findAll();
         else {
-            return riderRepository.findByActive(active);
+            List<Rider> riders = riderRepository.findByActive(active);
+            riders.forEach(rider -> {
+                List<ShopOrder> shopOrder = shopOrderRepository.findByRider(rider.getId());
+                rider.setOrderCount(shopOrder.size());
+//                List<Map<String, String>> ods = shopOrder.stream().map(order -> {
+//                    Map<String, String> map = new HashMap<>();
+//                    map.put("id", order.getId());
+//                    map.put("shopAddress", order.getShopAddress());
+//                    map.put("userAddress", order.getUserAddress());
+//                    return map;
+//                }).collect(Collectors.toList());
+
+
+            });
+            return riders;
         }
     }
 

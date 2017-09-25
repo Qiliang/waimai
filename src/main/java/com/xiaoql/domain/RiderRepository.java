@@ -13,4 +13,6 @@ public interface RiderRepository extends JpaRepository<Rider, String> {
     Rider findByPhone(String phone);
 
     List<Rider> findByActive(boolean active);
+
+    List<Rider> findByShopName(String shopName);
 }

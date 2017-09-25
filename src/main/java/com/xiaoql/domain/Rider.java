@@ -6,6 +6,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -21,7 +23,7 @@ public class Rider extends JPAEntity {
     private String lng;
     private String lat;
     private boolean active;
-
+    private String shopName;
     @CreatedDate
     private Date createdDate;
 
@@ -30,6 +32,25 @@ public class Rider extends JPAEntity {
 
     @Transient
     private int orderCount;
+
+    @Transient
+    private List<Map<String,String>> orders;
+
+    public List<Map<String, String>> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Map<String, String>> orders) {
+        this.orders = orders;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
 
     public boolean isActive() {
         return active;

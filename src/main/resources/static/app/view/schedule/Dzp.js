@@ -28,35 +28,23 @@ Ext.define('Kits.view.schedule.Dzp', {
                     }
                 }
             ],
-            tbar: [
-                {
-                    xtype: 'combo',
-                    emptyText: '输入商家名称筛选',
-                    store: Ext.create('Kits.store.Shop'),
-                    displayField: 'name',
-                    valueField: 'id',
-                    flex: 1
-                }
-            ],
+            // tbar: [
+            //     {
+            //         xtype: 'combo',
+            //         emptyText: '输入商家名称筛选',
+            //         store: Ext.create('Kits.store.Shop'),
+            //         displayField: 'name',
+            //         valueField: 'id',
+            //         flex: 1
+            //     }
+            // ],
             columns: [
                 {
                     text: '订单', dataIndex: 'description', flex: 1,
-                    renderer: function(value, metaData, record, rowIndex, colIndex, store, view){
-
-
-                        return '<div style="padding: 5px;"><span style="color:#4c82b1" class="fa fa-arrow-circle-left"></span>'+record.get('shopName')+'</div>'
-                              +'<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>'+ record.get('userAddress')+'</span></div>'
+                    renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                        return '<div style="padding: 5px;"><span style="color:#4c82b1" class="fa fa-arrow-circle-left"></span>' + record.get('shopName') + '</div>'
+                            + '<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>' + record.get('userAddress') + '</span></div>'
                     }
-                    // xtype: 'widgetcolumn', text: '订单地址', dataIndex: 'userAddress', flex: 1,
-                    // widget: {
-                    //     height: 24,
-                    //     xtype: 'image',
-                    //     bind: {src: '{record.userAddressImg}'}
-                    // },
-                    // renderer: function (value, metaData, record) {
-                    //     var userAddressImg = record.get('userAddressImg');
-                    //     return userAddressImg ? userAddressImg : record.get('userAddress');
-                    // }
                 }
             ],
             width: 350,

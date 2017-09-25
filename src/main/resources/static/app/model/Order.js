@@ -19,6 +19,7 @@ Ext.define('Kits.model.Order', {
         {name: 'shopLat', type: 'string'},
         {name: 'orderLng', type: 'string'},
         {name: 'orderLat', type: 'string'},
+        {name: 'orderCount', type: 'int'},
         {name: 'riderId', type: 'string'},
         {name: 'createdDate', type: 'date', dateFormat: 'time'},
         {name: 'lastModifiedDate', type: 'date', dateFormat: 'time'},
@@ -31,6 +32,7 @@ Ext.define('Kits.model.Order', {
             mapping: function (data) {
                 return data.rider ? +data.rider.phone + ':' + data.rider.name : null;
             }
-        }
+        },
+        {name: 'riders',persist :false},
     ]
 })

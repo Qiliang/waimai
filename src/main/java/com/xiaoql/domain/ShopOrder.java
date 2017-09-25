@@ -1,11 +1,13 @@
 package com.xiaoql.domain;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -15,6 +17,10 @@ public class ShopOrder extends JPAEntity {
     public ShopOrder() {
     }
 
+
+    public ShopOrder(String id) {
+        this.id = id;
+    }
 
     public ShopOrder(String id, String meituanViewId, String shopId, String shopName, String shopAddress, String shopPhone, Date time, String state, String userName, String userPhone, String userAddress, String remark, String shopLng, String shopLat, String orderLng, String orderLat, double totalAfter, String riderState, Date riderAssignTime, Date riderReadTime, Date riderGetGoodsTime, String riderGetGoodsLng, String riderGetGoodsLat, Date riderToUserTime, String riderToUserLng, String riderToUserLat, long riderCoast, String description) {
         this.id = id;
@@ -45,6 +51,7 @@ public class ShopOrder extends JPAEntity {
         this.riderToUserLat = riderToUserLat;
         this.riderCoast = riderCoast;
         this.description = description;
+
     }
 
 
@@ -107,6 +114,16 @@ public class ShopOrder extends JPAEntity {
     @LastModifiedDate
     private Date lastModifiedDate;
 
+    @Transient
+    private List<String> riders;
+
+    public List<String> getRiders() {
+        return riders;
+    }
+
+    public void setRiders(List<String> riders) {
+        this.riders = riders;
+    }
 
     public double getTotalAfter() {
         return totalAfter;

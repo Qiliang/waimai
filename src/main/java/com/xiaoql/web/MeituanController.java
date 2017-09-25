@@ -10,11 +10,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,6 +38,10 @@ public class MeituanController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private final Map<String, List<String>> riderMap = new ConcurrentHashMap<>();
 
 
     @GetMapping({"/shops"})
@@ -76,16 +83,16 @@ public class MeituanController {
     }
 
 
-    @GetMapping({"/dailyOrders"})
-    public List<ShopOrder> dailyOrders() {
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        return shopOrderRepository.findByTimeAfter(today.getTime());
-    }
+//    @GetMapping({"/dailyOrders"})
+//    public List<ShopOrder> dailyOrders() {
+//        Calendar today = Calendar.getInstance();
+//        today.set(Calendar.HOUR_OF_DAY, 0);
+//        today.set(Calendar.MINUTE, 0);
+//        today.set(Calendar.SECOND, 0);
+//        today.set(Calendar.MILLISECOND, 0);
+//
+//        return shopOrderRepository.findByTimeAfter(today.getTime());
+//    }
 
     @PostMapping({"/orders"})
     @Transactional
@@ -136,10 +143,30 @@ public class MeituanController {
         return shopOrderRepository.findAll(pageable);
     }
 
+    @Scheduled(initialDelay = 3000, fixedDelay = 1000 * 10)
+    public void getRider() {
+        List<Rider> riders = riderRepository.findAll();
+        Map<String, List<String>> riderMap = riders.stream().filter(r -> StringUtils.isNotBlank(r.getShopName()))
+                .collect(Collectors.groupingBy(Rider::getShopName, Collectors.mapping(Rider::getId, Collectors.toList())));
+        riderMap.put("others", riders.stream().filter(r -> StringUtils.isBlank(r.getShopName())).map(Rider::getId).collect(Collectors.toList()));
+        this.riderMap.putAll(riderMap);
+    }
+
+
     @GetMapping(value = {"/orders"}, params = {"state"})
     public List<ShopOrder> orders(@RequestParam String state) {
         if ("dzp".equalsIgnoreCase(state)) {
-            return shopOrderRepository.findByRiderIdIsNullOrderByTimeDesc(new PageRequest(0, 50));
+            List<ShopOrder> orders = shopOrderRepository.findByRiderIdIsNullOrderByTimeDesc(new PageRequest(0, 25));
+
+            orders.forEach(order -> {
+                if (this.riderMap.containsKey(order.getShopName())) {
+                    order.setRiders(this.riderMap.get(order.getShopName()));
+                } else {
+                    order.setRiders(this.riderMap.get("others"));
+                }
+            });
+            return orders;
+
         } else {
             return shopOrderRepository.findByRiderStateOrderByTimeDesc(state);
         }

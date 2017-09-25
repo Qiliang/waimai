@@ -68,6 +68,19 @@ Ext.define('Kits.view.Rider', {
         },
         {
             flex:1,
+            text: '专送商家',
+            dataIndex: 'shopName',
+            editor: {
+                allowBlank: true,
+                xtype:'combo',
+                store: Ext.create('Kits.store.Shop'),
+                forceSelection:true,
+                displayField: 'name',
+                valueField: 'name'
+            }
+        },
+        {
+            flex:1,
             text: '最后活跃时间',
             dataIndex: 'lastModifyTime',
             xtype: 'datecolumn',
