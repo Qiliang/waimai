@@ -3,13 +3,13 @@ Ext.define('Kits.store.Order', {
     model: 'Kits.model.Order',
     proxy: {
         type: 'rest',
-        url: '/meituan/orders',
+        url: '/api/orders',
         limitParam: 'size',
         pageParam: 'page',
         reader: {
             type: 'json',
-            rootProperty: 'content',
-            totalProperty: 'totalElements',
+            rootProperty: 'list',
+            totalProperty: 'total',
         }
     },
     remoteSort: true,

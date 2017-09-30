@@ -6,8 +6,7 @@ Ext.define('Kits.model.User', {
         {name: 'name',  type: 'string'},
         {name: 'loginName', type: 'string'},
         {name: 'loginPassword', type: 'string'},
-        {name: 'role', type: 'string'},
-        {name: 'alive', type: 'boolean'}
+        {name: 'role', type: 'string'}
     ]
 
 })

@@ -56,14 +56,6 @@ Ext.define('Kits.view.User', {
             }
         },
         {
-            text: '状态',
-            dataIndex: 'alive',
-            editor: {
-                xtype: 'checkbox',
-                cls: 'x-grid-checkheader-editor'
-            }
-        },
-        {
             text: '角色',
             dataIndex: 'role',
             editor: {

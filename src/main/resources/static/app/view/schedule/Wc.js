@@ -1,7 +1,7 @@
 Ext.define('Kits.view.schedule.Wc', {
     extend: 'Ext.grid.Panel',
     title: '调度--完成订单',
-    store: Ext.create('Kits.store.Order', {proxy: {extraParams: {state: 'wc'}}}),
+    store: Ext.create('Kits.store.Order', {proxy: {extraParams: {status: 8}}}),
     layout: 'fit',
 
     tools: [
@@ -15,16 +15,15 @@ Ext.define('Kits.view.schedule.Wc', {
     ],
 
     columns: [
-        {text: 'id', dataIndex: 'id', width: 170},
-        {text: '骑手', dataIndex: 'riderName', width: 100},
-        {text: '指派时间', dataIndex: 'riderAssignTime', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
-        {text: '描述', dataIndex: 'description'},
-        {text: '时间', dataIndex: 'time', xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
-        {text: '状态', dataIndex: 'state'},
-        {text: '客户', dataIndex: 'userName'},
-        {text: '地址', dataIndex: 'userAddress'},
-        {text: '电话', dataIndex: 'userPhone'},
-        {text: '备注', dataIndex: 'remark'}
+        {text: 'id', dataIndex: 'id',flex:1},
+        {text: '下单时间', dataIndex: 'time', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
+        {text: '状态', dataIndex: 'status',flex:1},
+        {text: '客户', dataIndex: 'recipientName',flex:1},
+        {text: '地址', dataIndex: 'recipientAddress',flex:1},
+        {text: '电话', dataIndex: 'recipientPhone',flex:1},
+        {text: '店铺', dataIndex: 'shopName',flex:1},
+        {text: '店铺地址', dataIndex: 'shopAddress',flex:1},
+        {text: '店铺电话', dataIndex: 'shopPhone',flex:1}
     ],
     bbar: {
         xtype: 'pagingtoolbar',

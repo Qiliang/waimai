@@ -55,8 +55,8 @@ Ext.define('Kits.view.BMap', {
         console.log(me.riderFiler)
         Ext.Array.each(recs, function (rec, index) {
 
-            var orderLng = parseFloat(rec.get('orderLng')) / 1000000;
-            var orderLat = parseFloat(rec.get('orderLat')) / 1000000;
+            var orderLng = parseFloat(rec.get('recipientLng')) / 100000;
+            var orderLat = parseFloat(rec.get('recipientLat')) / 100000;
             var shopLng = parseFloat(rec.get('shopLng')) / 1000000;
             var shopLat = parseFloat(rec.get('shopLat')) / 1000000;
             var convertor = new BMap.Convertor();
@@ -67,7 +67,8 @@ Ext.define('Kits.view.BMap', {
                 me.orderMarkers.push(markerSong);
                 markerSong.setIcon(me.mSong);
                 me.bmap.addOverlay(markerSong);
-                markerSong.setLabel(new BMap.Label(rec.get('userAddress'), {offset: new BMap.Size(20, -10)}));
+                var recipientAddress =rec.get('recipientAddress').split('@#')[0];
+                markerSong.setLabel(new BMap.Label(recipientAddress, {offset: new BMap.Size(20, -10)}));
                 markerSong.addEventListener("mouseover", me.markerMouseover.bind(markerSong));
                 markerSong.addEventListener("mouseout", me.markerMouseout.bind(markerSong));
 

@@ -42,7 +42,7 @@ Ext.define('Kits.view.Main', {
                         }
                     });
                 },
-                interval: 10000
+                interval: 30 * 1000
             };
             Ext.TaskManager.start(task);
         }

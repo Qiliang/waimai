@@ -81,6 +81,11 @@ Ext.define('Kits.view.Rider', {
         },
         {
             flex:1,
+            text: '状态',
+            dataIndex: 'status'
+        },
+        {
+            flex:1,
             text: '最后活跃时间',
             dataIndex: 'lastModifyTime',
             xtype: 'datecolumn',

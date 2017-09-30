@@ -63,13 +63,23 @@ Ext.define('Kits.view.Shop', {
         {
             flex: 1,
             text: '外送单价',
-            dataIndex: 'mpt',
+            dataIndex: 'shippingFee',
             editor: {
                 allowBlank: false,
                 xtype:'numberfield',
                 maxValue: 99,
                 minValue: 1
             }
+        },
+        {
+            flex: 1,
+            text: '绑定地址',
+            renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                if (record.get('meituanToken'))
+                    return '已绑定';
+                return '<a target="_blank" href="https://open-erp.meituan.com/storemap?developerId=101542&businessId=2&ePoiId=' + record.get('id') + '&signKey=s8qr0vail9rjx3au">绑定</a>';
+            }
+
         },
         {
             flex:1,

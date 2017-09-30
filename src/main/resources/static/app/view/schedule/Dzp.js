@@ -16,7 +16,7 @@ Ext.define('Kits.view.schedule.Dzp', {
             store: Ext.create('Kits.store.Order', {
                 proxy: {
                     type: 'ajax',
-                    url: '/meituan/orders?state=dzp'
+                    url: '/api/orders?status=4'
                 }
             }),
             tools: [
@@ -43,7 +43,7 @@ Ext.define('Kits.view.schedule.Dzp', {
                     text: '订单', dataIndex: 'description', flex: 1,
                     renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
                         return '<div style="padding: 5px;"><span style="color:#4c82b1" class="fa fa-arrow-circle-left"></span>' + record.get('shopName') + '</div>'
-                            + '<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>' + record.get('userAddress') + '</span></div>'
+                            + '<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>' + record.get('recipientAddress') + '</span></div>'
                     }
                 }
             ],

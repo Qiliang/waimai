@@ -1,22 +1,18 @@
-package com.xiaoql.domain;
+package com.xiaoql.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
 public class AppVersion {
+    private String version;
 
-    @Id
-    String version;
-    String url;
-    int status;
+    private String url;
+
+    private Integer status;
 
     public String getVersion() {
         return version;
     }
 
     public void setVersion(String version) {
-        this.version = version;
+        this.version = version == null ? null : version.trim();
     }
 
     public String getUrl() {
@@ -24,14 +20,14 @@ public class AppVersion {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = url == null ? null : url.trim();
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

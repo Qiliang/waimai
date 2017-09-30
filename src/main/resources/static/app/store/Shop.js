@@ -3,7 +3,7 @@ Ext.define('Kits.store.Shop', {
     model: 'Kits.model.Shop',
     proxy: {
         type: 'rest',
-        url: '/meituan/shops'
+        url: '/api/shops'
     },
     autoLoad: true,
     autoSync: true
