@@ -59,6 +59,7 @@ public class MeituanAPI {
         ValueMap valueMap = ValueMap.wrap(objectMapper.readValue(order, Map.class));
 
         Shop shop = shopMapper.selectByPrimaryKey(ePoiId);
+        if (StringUtils.isBlank(shop.getLng())) return Failed;
         ShopOrder shopOrder = new ShopOrder();
         shopOrder.setId(valueMap.valString("orderId"));
         Date orderTime = new Date();
@@ -70,8 +71,11 @@ public class MeituanAPI {
         shopOrder.setStatus((Integer) valueMap.get("status"));
         shopOrder.setRecipientPhone(valueMap.valString("recipientPhone"));
         shopOrder.setRecipientAddress(valueMap.valString("recipientAddress"));
-        shopOrder.setRecipientLng(valueMap.get("longitude").toString().replace(".", ""));
-        shopOrder.setRecipientLat(valueMap.get("latitude").toString().replace(".", ""));
+        shopOrder.setRecipientLng(StringUtils.rightPad(valueMap.get("longitude").toString().replace(".", ""), 9, '0'));
+        shopOrder.setRecipientLat(StringUtils.rightPad(valueMap.get("latitude").toString().replace(".", ""), 8, '0'));
+
+
+
         shopOrder.setShopLng(shop.getLng());
         shopOrder.setShopLat(shop.getLat());
         shopOrder.setTotal(Double.parseDouble(valueMap.get("total").toString()));
