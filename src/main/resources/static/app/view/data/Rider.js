@@ -31,14 +31,14 @@ Ext.define('Kits.view.data.Rider', {
                 timeout: 60 * 1000,
                 url: '/api/stat/riders',
                 params: {
-                    state: 'wc',
+                    status: 8,
                     from: Ext.Date.format(grid.down('datefield[name=from_date]').getValue(), 'Y-m-d'),
                     to: Ext.Date.format(grid.down('datefield[name=to_date]').getValue(), 'Y-m-d')
                 },
                 callback: function (options, success, response) {
                     grid.unmask();
                     if (!success)return;
-                    var store = Ext.create('Ext.data.ArrayStore', {
+                    var store = Ext.create('Ext.data.Store', {
                         fields: ['rider_id', 'num', 'price', 'rprice', 'name', 'phone'],
                         data: Ext.decode(response.responseText)
                     });
@@ -125,7 +125,7 @@ Ext.define('Kits.view.data.Rider', {
                             method: 'POST',
                             url: '/api/stat/days/riders/' + record.get('rider_id'),
                             params: {
-                                state: 'wc',
+                                status: 8,
                                 from: Ext.Date.format(me.down('datefield[name=from_date]').getValue(), 'Y-m-d'),
                                 to: Ext.Date.format(me.down('datefield[name=to_date]').getValue(), 'Y-m-d')
                             },
@@ -183,7 +183,7 @@ Ext.define('Kits.view.data.Rider', {
                             method: 'POST',
                             url: '/api/rider/stat/details',
                             params: {
-                                state: 'wc',
+                                status: 8,
                                 token: record.get('rider_id'),
                                 from: Ext.Date.format(me.down('datefield[name=from_date]').getValue(), 'Y-m-d'),
                                 to: Ext.Date.format(me.down('datefield[name=to_date]').getValue(), 'Y-m-d')
@@ -210,29 +210,30 @@ Ext.define('Kits.view.data.Rider', {
                                                     flex: 1,
                                                     text: '时间',
                                                     xtype: 'datecolumn',
+                                                    format: 'Y-m-d',
                                                     dataIndex: 'time'
                                                 },
                                                 {
-                                                    flex: 1,
+                                                    flex: 2,
                                                     text: '店铺名称',
-                                                    dataIndex: 'shopName'
+                                                    dataIndex: 'shop_name'
                                                 },
                                                 {
                                                     flex: 1,
                                                     text: '用户名称',
-                                                    dataIndex: 'userName'
+                                                    dataIndex: 'recipient_name'
                                                 }, {
                                                     flex: 2,
                                                     text: '用户地址',
-                                                    dataIndex: 'userAddress'
+                                                    dataIndex: 'recipient_address'
                                                 }, {
-                                                    flex: 2,
+                                                    flex: 1,
                                                     text: '运单金额',
-                                                    dataIndex: 'mpt'
+                                                    dataIndex: 'shipping_fee'
                                                 }, {
-                                                    flex: 2,
+                                                    flex: 1,
                                                     text: '订单金额',
-                                                    dataIndex: 'total_after'
+                                                    dataIndex: 'total'
                                                 }
                                             ],
                                             store: Ext.create('Ext.data.Store', {

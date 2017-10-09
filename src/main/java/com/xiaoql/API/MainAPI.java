@@ -125,7 +125,9 @@ public class MainAPI {
     }
 
     @PostMapping("/stat/days/riders/{riderId}")
-    public Object statRiderDay(@PathVariable String riderId, @RequestParam String from, @RequestParam String to, @RequestParam int status) {
+    public Object statRiderDay(@PathVariable String riderId, @RequestParam String from, @RequestParam String to, @RequestParam int status) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        to = sdf.format(DateUtils.addDays(sdf.parse(to), 1));
         return shopOrderExMapper.statRiderByDay(from, to, riderId, status);
     }
 

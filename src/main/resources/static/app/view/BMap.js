@@ -87,7 +87,7 @@ Ext.define('Kits.view.BMap', {
                 line.setStrokeOpacity(0.5);
                 line.setStrokeStyle("dashed");
                 me.bmap.addOverlay(line);
-                if (!me.mapcenter) me.mapcenter = data.points[0];
+                me.mapcenter = data.points[1];
                 console.log(me.mapcenter)
             });
         });

@@ -64,7 +64,7 @@ public class MeituanAPI {
         shopOrder.setId(valueMap.valString("orderId"));
         Date orderTime = new Date();
         System.out.println(valueMap.get("ctime"));
-        orderTime.setTime(Long.valueOf((Integer) valueMap.get("ctime")) * 1000);
+        orderTime.setTime((Integer) valueMap.get("ctime") * 1000L);
         shopOrder.setShopId(valueMap.valString("ePoiId"));
         shopOrder.setTime(orderTime);
         shopOrder.setShopName(valueMap.valString("poiName"));
@@ -366,7 +366,21 @@ public class MeituanAPI {
     }
 
     public static void main(String[] args) throws IOException {
-        Double d = 111.279216;
-        System.out.println(d.toString().replace(".", ""));
+//        String[] ids = TimeZone.getAvailableIDs();
+//        for (String id : ids)
+//            System.out.println(id);
+        int d = 1507528467;
+        //TimeZone tz = TimeZone.getTimeZone("Etc/GMT+0");
+        TimeZone tz = TimeZone.getDefault();
+        System.out.println(tz.getRawOffset());
+        System.out.println((d * 1000L));
+        System.out.println(tz.getOffset(1507528467));
+//Etc/GMT+0
+        Date orderTime = new Date();
+        orderTime.setTime(d * 1000);
+
+        System.out.println(orderTime);
+        orderTime.setTime(d * 1000L);
+        System.out.println(orderTime);
     }
 }

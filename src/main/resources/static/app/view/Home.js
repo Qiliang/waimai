@@ -100,7 +100,7 @@ Ext.define('Kits.view.Home', {
                         fontSize: '20px!important'
                     },
                     xtype: 'button',
-                    text: '平均配送时间：' + stat.orderCoast + '分钟',
+                    text: '平均配送时间：' + stat.orderCoast.toFixed(1) + '分钟',
                     width: 200,
                     height: 200
                 });

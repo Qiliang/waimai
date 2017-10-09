@@ -31,13 +31,14 @@ Ext.define('Kits.view.data.Shop', {
                 timeout: 60 * 1000,
                 url: '/api/stat/shops',
                 params: {
+                    status: 8,
                     from: Ext.Date.format(grid.down('datefield[name=from_date]').getValue(), 'Y-m-d'),
                     to: Ext.Date.format(grid.down('datefield[name=to_date]').getValue(), 'Y-m-d')
                 },
                 callback: function (options, success, response) {
                     grid.unmask();
                     if (!success)return;
-                    var store = Ext.create('Ext.data.ArrayStore', {
+                    var store = Ext.create('Ext.data.Store', {
                         fields: ['shop_name', 'num', 'price'],
                         data: Ext.decode(response.responseText)
                     });

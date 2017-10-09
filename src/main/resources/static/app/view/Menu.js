@@ -79,7 +79,7 @@ Ext.define('Kits.view.Menu', {
                         }, {
                             iconCls: 'x-fa fa-table',
                             leaf: true,
-                            text: '异常订单',
+                            text: '取消订单',
                             cmp: 'Kits.view.schedule.Yc'
                         }, {
                             iconCls: 'x-fa fa-table',
