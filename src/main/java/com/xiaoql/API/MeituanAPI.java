@@ -63,6 +63,7 @@ public class MeituanAPI {
         ShopOrder shopOrder = new ShopOrder();
         shopOrder.setId(valueMap.valString("orderId"));
         Date orderTime = new Date();
+        System.out.println(valueMap.get("ctime"));
         orderTime.setTime(Long.valueOf((Integer) valueMap.get("ctime")) * 1000);
         shopOrder.setShopId(valueMap.valString("ePoiId"));
         shopOrder.setTime(orderTime);

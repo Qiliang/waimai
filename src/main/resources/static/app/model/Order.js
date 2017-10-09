@@ -30,9 +30,9 @@ Ext.define('Kits.model.Order', {
         'riderCompleteLat',
         {name: 'riderCoast', type: 'float'},
         {
-            name: 'riderName', type: 'string', persist: false,
+            name: 'riderDisplayName', type: 'string', persist: false,
             mapping: function (data) {
-                return data.rider ? +data.rider.phone + ':' + data.rider.name : null;
+                return data.riderId ? +data.riderPhone + ':' + data.riderName : null;
             }
         },
         {name: 'riders',persist :false},

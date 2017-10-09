@@ -55,8 +55,8 @@ Ext.define('Kits.view.BMap', {
         console.log(me.riderFiler)
         Ext.Array.each(recs, function (rec, index) {
 
-            var orderLng = parseFloat(rec.get('recipientLng')) / 100000;
-            var orderLat = parseFloat(rec.get('recipientLat')) / 100000;
+            var orderLng = parseFloat(rec.get('recipientLng')) / 1000000;
+            var orderLat = parseFloat(rec.get('recipientLat')) / 1000000;
             var shopLng = parseFloat(rec.get('shopLng')) / 1000000;
             var shopLat = parseFloat(rec.get('shopLat')) / 1000000;
             var convertor = new BMap.Convertor();
@@ -110,7 +110,7 @@ Ext.define('Kits.view.BMap', {
         var me = this;
         me.riderStore = Ext.create('Kits.store.Rider', {
             proxy: {
-                extraParams: {active: true}
+                extraParams: {status: 1}
             },
             listeners: {
                 load: function (store, records, successful, operation, eOpts) {
@@ -128,7 +128,7 @@ Ext.define('Kits.view.BMap', {
                         var lat = parseFloat(rec.get('lat')) / 1000000;
                         // lng += Ext.Number.randomInt(1, 10) / 1000.0;
                         // lat += Ext.Number.randomInt(1, 10) / 1000.0;
-                        if(!rec.get('active'))return;
+                        if (rec.get('status') != 1)return;
                         var riderId = rec.get("id");
                         var displayName = rec.get("displayName");
                         if (isNaN(lng) || isNaN(lat))return;
@@ -188,7 +188,7 @@ Ext.define('Kits.view.BMap', {
                                                             var orderId = context.record.get('id');
                                                             Ext.Ajax.request({
                                                                 method: 'POST',
-                                                                url: '/meituan/orders/' + orderId + '/reasign/' + displayName,
+                                                                url: '/api/orders/' + orderId + '/reasign/' + displayName,
                                                                 callback: function (options, success, response) {
 
                                                                 }

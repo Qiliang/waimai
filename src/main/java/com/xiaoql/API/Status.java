@@ -11,4 +11,9 @@ public class Status {
     public final static Integer OrderRiderAssgin = 11;
     public final static Integer OrderRiderGotGoods = 12;
     public final static Integer OrderCompleted = 6;
+
+
+    //骑手状态 0关闭接单   1开启接单
+    public final static Integer RiderClosed = 0;
+    public final static Integer RiderActived = 1;
 }

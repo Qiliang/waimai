@@ -71,7 +71,7 @@ Ext.define('Kits.view.schedule.Dzp', {
                     if (r !== 'yes') return;
                     Ext.Ajax.request({
                         method: 'POST',
-                        url: '/meituan/orders/' +orderRecords + '/asign/' + riderId,
+                        url: '/api/orders/' +orderRecords + '/asign/' + riderId,
                         success: function (response, opts) {
                             grid.getStore().load({
                                 scope: this,

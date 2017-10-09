@@ -61,13 +61,18 @@ public class RiderAPI {
      */
     @PostMapping("/active")
     @Transactional
-    public Object active(String token, boolean active, HttpServletResponse response) {
+    public Object active(String token, int status, HttpServletResponse response) {
 
         Rider rider = riderMapper.selectByPrimaryKey(token);
         if (rider == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
         }
+
+        riderMapper.updateByPrimaryKeySelective(new Rider() {{
+            setId(token);
+            setStatus(status);
+        }});
 
         riderMapper.updateByPrimaryKey(rider);
         return new RestResponse();
@@ -86,9 +91,12 @@ public class RiderAPI {
             return new RestResponse(true, "骑手未登录");
         }
 
-        rider.setLat(lat);
-        rider.setLng(lng);
-        riderMapper.updateByPrimaryKey(rider);
+        riderMapper.updateByPrimaryKeySelective(new Rider(){{
+            setId(token);
+            setLat(lat);
+            setLng(lng);
+            setLastModifyTime(new Date());
+        }});
         return new RestResponse();
     }
 
@@ -169,6 +177,11 @@ public class RiderAPI {
         shopOrder.setRiderCompleteTime(now);
         shopOrder.setRiderCompleteLng(lng);
         shopOrder.setRiderCompleteLat(lat);
+        if (shopOrder.getRiderAssignTime() == null) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return new RestResponse(true, "订单未指派");
+        }
+
         shopOrder.setRiderCoast((int) ((now.getTime() - shopOrder.getRiderAssignTime().getTime()) / 1000));
         shopOrderMapper.updateByPrimaryKey(shopOrder);
         return new RestResponse();
