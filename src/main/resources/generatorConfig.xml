@@ -47,10 +47,10 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 指定数据库表 -->
-        <table schema="" tableName="app_version"></table>
+        <!--<table schema="" tableName="app_version"></table>-->
         <table schema="" tableName="rider"></table>
-        <table schema="" tableName="shop"></table>
-        <table schema="" tableName="shop_order"></table>
-        <table schema="" tableName="user"></table>
+        <!--<table schema="" tableName="shop"></table>-->
+        <!--<table schema="" tableName="shop_order"></table>-->
+        <!--<table schema="" tableName="user"></table>-->
     </context>
 </generatorConfiguration>

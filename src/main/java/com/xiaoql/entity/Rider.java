@@ -21,6 +21,8 @@ public class Rider {
 
     private String shopId;
 
+    private String clientId;
+
     private Integer orderCount;
 
     private Date lastModifyTime;
@@ -95,6 +97,14 @@ public class Rider {
 
     public void setShopId(String shopId) {
         this.shopId = shopId == null ? null : shopId.trim();
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId == null ? null : clientId.trim();
     }
 
     public Integer getOrderCount() {

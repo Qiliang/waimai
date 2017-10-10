@@ -11,6 +11,7 @@ import com.xiaoql.mapper.ShopOrderMapper;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
@@ -84,7 +86,7 @@ public class RiderAPI {
      */
     @PostMapping("/position")
     @Transactional
-    public Object position(String token, String lng, String lat, HttpServletResponse response) {
+    public Object position(String token, String lng, String lat, String clientId, HttpServletResponse response) {
         Rider rider = riderMapper.selectByPrimaryKey(token);
         if (rider == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -95,9 +97,22 @@ public class RiderAPI {
             setId(token);
             setLat(lat);
             setLng(lng);
+            setClientId(clientId);
             setLastModifyTime(new Date());
         }});
         return new RestResponse();
+    }
+
+    @Scheduled(initialDelay = 5 * 1000, fixedDelay = 60 * 1000)
+    public void shop() throws IOException {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, -2);
+        riderMapper.updateByExampleSelective(new Rider() {{
+            setStatus(0);
+        }}, new RiderExample() {{
+            createCriteria().andLastModifyTimeLessThan(calendar.getTime()).andStatusEqualTo(1);
+        }});
     }
 
     /**

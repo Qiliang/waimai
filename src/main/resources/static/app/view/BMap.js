@@ -157,7 +157,7 @@ Ext.define('Kits.view.BMap', {
                                 url: '/api/rider/orders',
                                 params: {
                                     token: rec.get('id'),
-                                    riderState: 'dqc',
+                                    status: 11,
                                 },
                                 callback: function (options, success, response) {
                                     if (!success) {
@@ -176,7 +176,7 @@ Ext.define('Kits.view.BMap', {
                                                 xtype: 'grid',
                                                 store: Ext.create('Ext.data.Store', {
                                                     model: 'Kits.model.Order',
-                                                    data: Ext.decode(response.responseText).content
+                                                    data: Ext.decode(response.responseText).list
                                                 }),
                                                 plugins: [{
                                                     ptype: 'rowediting',
@@ -212,7 +212,7 @@ Ext.define('Kits.view.BMap', {
                                                         format: 'Y-m-d H:i:s'
                                                     },
                                                     {text: '店铺', flex: 1, dataIndex: 'shopName'},
-                                                    {text: '客户地址', flex: 1, dataIndex: 'userAddress'},
+                                                    {text: '客户地址', flex: 1, dataIndex: 'recipientAddress'},
                                                     {
                                                         text: '骑手', dataIndex: 'riderName', width: 160,
                                                         editor: {

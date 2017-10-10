@@ -4,6 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xiaoql.entity.*;
 import com.xiaoql.mapper.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -344,7 +347,7 @@ public class MainAPI {
             }});
 
             orders.forEach(order -> {
-                if (this.riderMap.containsKey(order.getShopName())) {
+                if (this.riderMap.containsKey(order.getShopId())) {
                     order.setRiders(this.riderMap.get(order.getShopId()));
                 } else {
                     order.setRiders(this.riderMap.get("others"));
@@ -393,7 +396,9 @@ public class MainAPI {
                 setRiderPhone(rider.getPhone());
             }});
         }
+
     }
+
 
     @PostMapping({"/orders/{id}/reasign/{riderDisplayName}"})
     public void orderReAsignRider(@PathVariable String id, @PathVariable String riderDisplayName, HttpServletResponse response) {

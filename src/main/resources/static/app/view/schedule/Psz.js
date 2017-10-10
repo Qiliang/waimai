@@ -39,7 +39,7 @@ Ext.define('Kits.view.schedule.Psz', {
     columns: [
         {text: 'id', dataIndex: 'id', width: 170},
         {
-            text: '骑手', dataIndex: 'riderName', width: 160,
+            text: '骑手', dataIndex: 'riderDisplayName', width: 160,
             editor: {
                 xtype: 'combo',
                 displayField: 'displayName',

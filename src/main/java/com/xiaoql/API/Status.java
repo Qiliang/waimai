@@ -10,7 +10,7 @@ public class Status {
     public final static Integer OrderCanceled = 9;
     public final static Integer OrderRiderAssgin = 11;
     public final static Integer OrderRiderGotGoods = 12;
-    public final static Integer OrderCompleted = 6;
+    public final static Integer OrderCompleted = 8;
 
 
     //骑手状态 0关闭接单   1开启接单

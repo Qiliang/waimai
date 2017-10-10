@@ -61,7 +61,7 @@ Ext.define('Kits.view.Home', {
                 dzpPanel.removeAll();
                 dzpPanel.add({
                     xtype: 'button',
-                    text: '待指派：' + stat.orderPszCount,
+                    text: '配送中：' + stat.orderPszCount,
                     width: 200,
                     height: 200
                 });
@@ -88,7 +88,7 @@ Ext.define('Kits.view.Home', {
                 ycPanel.removeAll();
                 ycPanel.add({
                     xtype: 'button',
-                    text: '异常订单：' + stat.orderYcCount,
+                    text: '取消订单：' + stat.orderYcCount,
                     width: 200,
                     height: 200
                 });

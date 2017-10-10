@@ -69,14 +69,14 @@ Ext.define('Kits.view.Rider', {
         {
             flex:1,
             text: '专送商家',
-            dataIndex: 'shopName',
+            dataIndex: 'shopId',
             editor: {
                 allowBlank: true,
                 xtype:'combo',
                 store: Ext.create('Kits.store.Shop'),
                 forceSelection:true,
                 displayField: 'name',
-                valueField: 'name'
+                valueField: 'id'
             }
         },
         {
