@@ -8,6 +8,7 @@ import com.xiaoql.entity.ShopOrder;
 import com.xiaoql.entity.ShopOrderExample;
 import com.xiaoql.mapper.RiderMapper;
 import com.xiaoql.mapper.ShopOrderMapper;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
@@ -56,6 +58,26 @@ public class RiderAPI {
             json.put("message", "用户名或密码错误");
         }
         return json;
+    }
+
+
+    /**
+     * 骑手自身状态
+     */
+    @PostMapping("/me")
+    @Transactional
+    public Object me(String token, HttpServletResponse response) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Rider rider = riderMapper.selectByPrimaryKey(token);
+        if (rider == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return new RestResponse(true, "骑手未登录");
+        }
+        Map<String, String> me = BeanUtilsBean.getInstance().describe(rider);
+        me.remove("loginName");
+        me.remove("loginPassword");
+        me.remove("orderCount");
+        me.remove("class");
+        return me;
     }
 
     /**
