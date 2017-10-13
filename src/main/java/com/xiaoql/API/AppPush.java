@@ -27,7 +27,6 @@ public class AppPush {
     public void pushToRider(String clientId) {
         try {
             OkHttpClient client = new OkHttpClient();
-            String timestamp = new Date().getTime() + "";
             RequestBody body = RequestBody.create(JSON,
                     "{\n" +
                             "     \"message\": {\n" +

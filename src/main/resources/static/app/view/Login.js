@@ -27,18 +27,18 @@ Ext.define('Kits.view.Login', {
             {
                 text: '进入',
                 handler: function () {
-                    var panel = this.up('panel');
-                    panel.mask();
+                    var viewport = this.up('viewport');
+                    viewport.mask();
                     Ext.Ajax.request({
                         method: 'POST',
                         url: '/api/login/',
                         params:{
-                            username:panel.down('textfield[name=user]').getValue(),
-                            password:panel.down('textfield[name=pass]').getValue(),
+                            username:viewport.down('textfield[name=user]').getValue(),
+                            password:viewport.down('textfield[name=pass]').getValue(),
                         },
                         callback: function (options, success, response) {
-                            panel.unmask();
                             if (!success) {
+                                viewport.unmask();
                                 Ext.toast({
                                     html: response.responseText,
                                     align: 't'

@@ -40,12 +40,12 @@ Ext.define('Kits.view.schedule.Psz', {
         {text: 'id', dataIndex: 'id', width: 170},
         {
             text: '骑手', dataIndex: 'riderDisplayName', width: 160,
-            editor: {
-                xtype: 'combo',
-                displayField: 'displayName',
-                valueField: 'displayName',
-                store: Ext.create('Kits.store.Rider')
-            }
+            // editor: {
+            //     xtype: 'combo',
+            //     displayField: 'displayName',
+            //     valueField: 'displayName',
+            //     store: Ext.create('Kits.store.Rider')
+            // }
         },
         {text: 'id', dataIndex: 'id',flex:1},
         {text: '下单时间', dataIndex: 'time', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},

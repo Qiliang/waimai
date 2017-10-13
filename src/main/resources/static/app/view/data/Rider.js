@@ -243,7 +243,7 @@ Ext.define('Kits.view.data.Rider', {
                                                         type: 'date',
                                                         dateFormat: 'time'
                                                     },
-                                                    'shopName', 'userName', 'userAddress','mpt','total_after'],
+                                                    'shopName', 'recipientName', 'recipientAddress','shippingFee','total'],
                                                 data: Ext.decode(response.responseText)
                                             })
                                         }

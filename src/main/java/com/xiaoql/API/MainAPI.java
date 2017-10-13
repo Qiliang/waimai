@@ -43,6 +43,9 @@ public class MainAPI {
     @Autowired
     private ShopMapper shopMapper;
 
+    @Autowired
+    private AppPush appPush;
+
     @PostMapping("/login")
     public Object login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
         UserExample userExample = new UserExample();
@@ -395,6 +398,7 @@ public class MainAPI {
                 setRiderName(rider.getName());
                 setRiderPhone(rider.getPhone());
             }});
+            appPush.pushToRider(rider.getClientId());
         }
 
     }
