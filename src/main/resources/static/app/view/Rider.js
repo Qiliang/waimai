@@ -15,7 +15,16 @@ Ext.define('Kits.view.Rider', {
         ptype: 'rowediting',
         clicksToMoveEditor: 1,
         autoCancel: false
+
     }],
+    listeners: {
+        edit: function (editor, e) {
+            setTimeout(function(){
+                e.grid.getStore().load();
+            },100);
+
+        }
+    },
     tbar: [{
         iconCls: 'x-fa fa-plus',
         text: '骑手',
@@ -70,6 +79,9 @@ Ext.define('Kits.view.Rider', {
             flex:1,
             text: '专送商家',
             dataIndex: 'shopId',
+            renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                return record.get('shopName');
+            },
             editor: {
                 allowBlank: true,
                 xtype:'combo',

@@ -33,6 +33,8 @@ public class MainAPI {
 
     @Autowired
     RiderMapper riderMapper;
+    @Autowired
+    RiderExMapper riderExMapper;
 
     @Autowired
     private ShopOrderMapper shopOrderMapper;
@@ -248,10 +250,11 @@ public class MainAPI {
 
 
     @GetMapping("/riders")
-    public List<Rider> riders(Integer status) {
+    public Object riders(Integer status) {
         RiderExample example = new RiderExample();
-        if (status == null)
-            return riderMapper.selectByExample(example);
+        if (status == null) {
+            return riderExMapper.getAllWithShop();
+        }
         else {
             example.createCriteria().andStatusEqualTo(status);
             List<Rider> riders = riderMapper.selectByExample(example);
@@ -268,6 +271,7 @@ public class MainAPI {
     public void riders(@PathVariable String id, @RequestBody Map<String, Object> modifier, HttpServletResponse response) {
         Rider rider = riderMapper.selectByPrimaryKey(id);
         Utils.updateBean(rider, modifier);
+        if(rider.getShopId().equals(""))rider.setShopId(null);
         riderMapper.updateByPrimaryKey(rider);
     }
 
@@ -280,6 +284,7 @@ public class MainAPI {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
             return new RestResponse(true, "登录名重复");
         }
+        toCreator.setShopId(null);
         riderMapper.insertSelective(toCreator);
         return new RestResponse();
     }

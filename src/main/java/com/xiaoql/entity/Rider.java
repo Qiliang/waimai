@@ -17,9 +17,19 @@ public class Rider {
 
     private String lat;
 
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
     private Integer status;
 
     private String shopId;
+
+    private String shopName;
 
     private String clientId;
 
@@ -114,6 +124,8 @@ public class Rider {
     public void setOrderCount(Integer orderCount) {
         this.orderCount = orderCount;
     }
+
+
 
     public Date getLastModifyTime() {
         return lastModifyTime;

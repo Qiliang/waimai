@@ -10,6 +10,7 @@ Ext.define('Kits.model.Rider', {
         {name: 'lng', type: 'string'},
         {name: 'lat', type: 'string'},
         {name: 'shopId', type: 'string'},
+        {name: 'shopName', type: 'string'},
         {name: 'lastModifyTime', type: 'date', dateFormat: 'time'},
         {name:'status',type:'int'},
         {name:'orders',persist :false},
