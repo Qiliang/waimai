@@ -98,7 +98,6 @@ public class RiderAPI {
             setStatus(status);
         }});
 
-        riderMapper.updateByPrimaryKey(rider);
         return new RestResponse();
     }
 
