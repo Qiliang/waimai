@@ -1,6 +1,6 @@
 Ext.define('Kits.view.schedule.Yc', {
     extend: 'Ext.grid.Panel',
-    title: '调度--异常订单',
+    title: '调度--取消订单',
     store: Ext.create('Kits.store.Order', {proxy: {extraParams: {status: 9}}}),
     layout: 'fit',
 
@@ -17,6 +17,7 @@ Ext.define('Kits.view.schedule.Yc', {
 
     columns: [
         {text: 'id', dataIndex: 'id',flex:1},
+        {text: '当日序号', dataIndex: 'daySeq',width:80},
         {text: '下单时间', dataIndex: 'time', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
         {text: '状态', dataIndex: 'status',flex:1},
         {text: '客户', dataIndex: 'recipientName',flex:1},

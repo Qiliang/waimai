@@ -15,6 +15,7 @@ Ext.define('Kits.view.Order', {
 
     columns: [
         {text: 'id', dataIndex: 'id',flex:1},
+        {text: '当日序号', dataIndex: 'daySeq',width:80},
         {text: '下单时间', dataIndex: 'time', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
         {text: '状态', dataIndex: 'status',flex:1},
         {text: '客户', dataIndex: 'recipientName',flex:1},
@@ -28,6 +29,23 @@ Ext.define('Kits.view.Order', {
         // {text: '店铺纬度', dataIndex: 'shopLat'},
         // {text: '用户经度', dataIndex: 'orderLng'},
         // {text: '用户纬度', dataIndex: 'orderLat'}
+    ],
+    tbar: [
+        {
+            xtype: 'textfield',
+            itemId: 'orderId',
+            fieldLabel: '订单号'
+
+        }, {
+            xtype: 'button',
+            text: '搜索',
+            handler: function () {
+                var me = this.up('grid');
+                var value = me.queryById('orderId').getValue();
+                me.getStore().getProxy().setExtraParams({orderIdFilter:value});
+                me.getStore().load();
+            }
+        }
     ],
     bbar: {
         xtype: 'pagingtoolbar',

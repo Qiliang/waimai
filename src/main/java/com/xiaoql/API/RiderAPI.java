@@ -7,6 +7,7 @@ import com.xiaoql.entity.RiderExample;
 import com.xiaoql.entity.ShopOrder;
 import com.xiaoql.entity.ShopOrderExample;
 import com.xiaoql.mapper.RiderMapper;
+import com.xiaoql.mapper.ShopOrderExMapper;
 import com.xiaoql.mapper.ShopOrderMapper;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -25,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/rider")
@@ -35,6 +37,8 @@ public class RiderAPI {
 
     @Autowired
     private ShopOrderMapper shopOrderMapper;
+    @Autowired
+    private ShopOrderExMapper  shopOrderExMapper;
 
     private String token(String username) {
         Md5Crypt.apr1Crypt(username);
@@ -141,7 +145,7 @@ public class RiderAPI {
      */
     @PostMapping("/orders")
     @Transactional
-    public Object orders(String token, int status,
+    public Object orders(String token, String status,
                          @RequestParam(required = false, defaultValue = "1") Integer page,
                          @RequestParam(required = false, defaultValue = "25") Integer size, HttpServletResponse response) {
         Rider rider = riderMapper.selectByPrimaryKey(token);
@@ -149,9 +153,11 @@ public class RiderAPI {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
         }
-
         ShopOrderExample example = new ShopOrderExample();
-        example.createCriteria().andRiderIdEqualTo(token).andStatusEqualTo(status);
+        Arrays.stream(status.split(",")).map(s -> Integer.parseInt(s)).collect(Collectors.toList()).forEach(st -> {
+            example.or().andRiderIdEqualTo(token).andStatusEqualTo(st);
+        });
+
         example.setOrderByClause("time desc");
         PageHelper.startPage(page, size);
         return new PageInfo<ShopOrder>(shopOrderMapper.selectByExample(example));
@@ -168,9 +174,11 @@ public class RiderAPI {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return new RestResponse(true, "骑手未登录");
         }
-        ShopOrder shopOrder = shopOrderMapper.selectByPrimaryKey(orderId);
-        shopOrder.setRiderReadTime(new Date());
-        shopOrderMapper.updateByPrimaryKey(shopOrder);
+
+        shopOrderExMapper.batchReadUpdate(new Date(),orderId);
+//        ShopOrder shopOrder = shopOrderMapper.selectByPrimaryKey(orderId);
+//        shopOrder.setRiderReadTime(new Date());
+//        shopOrderMapper.updateByPrimaryKey(shopOrder);
         return new RestResponse();
     }
 
@@ -236,7 +244,7 @@ public class RiderAPI {
 
         ShopOrderExample example = new ShopOrderExample();
         example.createCriteria().andRiderIdEqualTo(token).andStatusEqualTo(Status.OrderRiderAssgin)
-                .andRiderAssignTimeGreaterThan(Utils.toDate(time));
+                .andRiderAssignTimeGreaterThan(Utils.toDate(time)).andRiderReadTimeIsNotNull();
         PageHelper.startPage(1, 1, false);
         List list = shopOrderMapper.selectByExample(example);
         Map<String, Object> map = new HashMap<>();

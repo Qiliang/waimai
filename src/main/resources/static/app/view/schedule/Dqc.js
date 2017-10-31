@@ -38,6 +38,7 @@ Ext.define('Kits.view.schedule.Dqc', {
 
     columns: [
         {text: 'id', dataIndex: 'id', width: 170},
+        {text: '当日序号', dataIndex: 'daySeq',width:80},
         {
             text: '骑手', dataIndex: 'riderDisplayName', width: 160,
             editor: {

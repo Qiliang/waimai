@@ -27,8 +27,18 @@ public class ValueMap extends HashMap<String, Object> {
         return (String) this.get(key);
     }
 
-    public String valInt(String key) {
-        return (String) this.get(key);
+    public int valInt(String key) {
+        Object value = this.get(key);
+        if (value instanceof Integer) {
+            return (Integer) value;
+        } else if (value instanceof Long) {
+            return ((Long) value).intValue();
+        } else if (value instanceof Double) {
+            return ((Double) value).intValue();
+        } else if (value instanceof Float) {
+            return ((Float) value).intValue();
+        }
+        return (Integer) this.get(key);
     }
 
 }

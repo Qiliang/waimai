@@ -1974,6 +1974,76 @@ public class ShopOrderExample {
             addCriterion("rider_coast not between", value1, value2, "riderCoast");
             return (Criteria) this;
         }
+
+        public Criteria andDaySeqIsNull() {
+            addCriterion("day_seq is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqIsNotNull() {
+            addCriterion("day_seq is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqEqualTo(String value) {
+            addCriterion("day_seq =", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqNotEqualTo(String value) {
+            addCriterion("day_seq <>", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqGreaterThan(String value) {
+            addCriterion("day_seq >", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqGreaterThanOrEqualTo(String value) {
+            addCriterion("day_seq >=", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqLessThan(String value) {
+            addCriterion("day_seq <", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqLessThanOrEqualTo(String value) {
+            addCriterion("day_seq <=", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqLike(String value) {
+            addCriterion("day_seq like", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqNotLike(String value) {
+            addCriterion("day_seq not like", value, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqIn(List<String> values) {
+            addCriterion("day_seq in", values, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqNotIn(List<String> values) {
+            addCriterion("day_seq not in", values, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqBetween(String value1, String value2) {
+            addCriterion("day_seq between", value1, value2, "daySeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andDaySeqNotBetween(String value1, String value2) {
+            addCriterion("day_seq not between", value1, value2, "daySeq");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

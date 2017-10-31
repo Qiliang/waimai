@@ -48,6 +48,7 @@ Ext.define('Kits.view.schedule.Psz', {
             // }
         },
         {text: 'id', dataIndex: 'id',flex:1},
+        {text: '当日序号', dataIndex: 'daySeq',width:80},
         {text: '下单时间', dataIndex: 'time', width: 150, xtype: 'datecolumn', format: 'Y-m-d H:i:s'},
         {text: '状态', dataIndex: 'status',flex:1},
         {text: '客户', dataIndex: 'recipientName',flex:1},

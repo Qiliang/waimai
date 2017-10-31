@@ -3,7 +3,9 @@ package com.xiaoql.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,13 @@ public interface ShopOrderExMapper {
 
     @Select("select shop_name,count(shop_name) num,sum(total) price from shop_order where time>#{from1} and time<#{to} and status=#{status} group by shop_name")
     List<Map<String, Object>> statByShop(@Param("from1") String from1, @Param("to")String to, @Param("status")int status);
+
+    @Select("select rider_id,`status`,count(*) count from shop_order where rider_id is not null group by rider_id,`status`")
+    List<Map<String, Object>> groupByRiderStatus();
+
+
+    @Update("update shop_order set rider_read_time=#{time} where id in (#{ids}) and rider_read_time is not null")
+    int batchReadUpdate(@Param("time") Date time,@Param("ids") String ids);
 
 
 }

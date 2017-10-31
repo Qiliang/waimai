@@ -1,7 +1,6 @@
 package com.xiaoql.entity;
 
 import java.util.Date;
-import java.util.List;
 
 public class ShopOrder {
     private String id;
@@ -59,6 +58,8 @@ public class ShopOrder {
     private String riderCompleteLat;
 
     private Integer riderCoast;
+
+    private String daySeq;
 
     public String getId() {
         return id;
@@ -284,14 +285,11 @@ public class ShopOrder {
         this.riderCoast = riderCoast;
     }
 
-
-    private List<String> riders;
-
-    public List<String> getRiders() {
-        return riders;
+    public String getDaySeq() {
+        return daySeq;
     }
 
-    public void setRiders(List<String> riders) {
-        this.riders = riders;
+    public void setDaySeq(String daySeq) {
+        this.daySeq = daySeq == null ? null : daySeq.trim();
     }
 }

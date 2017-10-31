@@ -16,6 +16,7 @@ Ext.define('Kits.view.schedule.Wc', {
 
     columns: [
         {text: 'id', dataIndex: 'id',flex:1},
+        {text: '当日序号', dataIndex: 'daySeq',width:80},
         {
             text: '骑手', dataIndex: 'riderDisplayName', width: 160,
         },

@@ -8,7 +8,7 @@ Ext.define('Kits.view.BMap', {
     mQi: new BMap.Icon('/marker/Marker_qi.png', new BMap.Size(48, 48)),
     mQu: new BMap.Icon('/marker/Marker_qu.png', new BMap.Size(48, 48)),
     mSong: new BMap.Icon('/marker/Marker_song.png', new BMap.Size(48, 48)),
-    riderFiler: [],
+
 
     initComponent : function(){
         Ext.applyIf(this,{
@@ -45,14 +45,7 @@ Ext.define('Kits.view.BMap', {
     markerOrder: function (recs) {
         if (!recs || recs.length == 0)return;
         var me = this;
-        //var mapcenter = null;
-        var filter = recs[0].get('riders');
-        Ext.Array.each(recs, function (rec, index) {
-            filter = Ext.Array.intersect(rec.get('riders'), filter);
-        });
-        me.riderFiler = filter;
         me.riderStore.load();
-        console.log(me.riderFiler)
         Ext.Array.each(recs, function (rec, index) {
 
             var orderLng = parseFloat(rec.get('recipientLng')) / 1000000;
@@ -77,22 +70,61 @@ Ext.define('Kits.view.BMap', {
                 me.orderMarkers.push(markerQu);
                 markerQu.setIcon(me.mQu);
                 me.bmap.addOverlay(markerQu);
-                markerQu.setLabel(new BMap.Label(rec.get('shopName'), {offset: new BMap.Size(20, -10)}));
+                var statusDesc = ''
+                if (rec.get('status') === 12) statusDesc = '[已取]'
+                if (rec.get('status') === 11) statusDesc = '[未取]'
+                markerQu.setLabel(new BMap.Label(rec.get('shopName') + statusDesc, {offset: new BMap.Size(20, -10)}));
                 markerQu.addEventListener("mouseover", me.markerMouseover.bind(markerQu));
                 markerQu.addEventListener("mouseout", me.markerMouseout.bind(markerQu));
+                markerSong.addEventListener('dblclick', function () {
+                    Ext.create('Ext.window.Window', {
+                        modal: true,
+                        layout: 'fit',
+                        title: '选择骑手',
+                        listeners: {
+                            afterrender: function (view) {
+                                view.down('combo').expand();
+                            }
+                        },
+                        items: {
+                            xtype: 'combo',
+                            forceSelection: true,
+                            store: Ext.create('Kits.store.Rider', {
+                                autoLoad: true,
+                                filters: [
+                                    function (item) {
+                                        return item.get('status') === 1;
+                                    }
+                                ],
+                                sorters: {property: 'status', direction: 'DESC'}
+                            }),
+                            displayField: 'displayName',
+                            valueField: 'riderId',
+                            listeners: {
+                                select: function (combo, record, eOpts) {
+                                    me.reasignToRider(record.get('id'), record.get('displayName'), rec.get('id'), function () {
+                                        combo.up('window').close();
+                                    });
+                                }
+                            }
 
+                        }
+                    }).show();
+                }.bind(me));
 
                 var line = new BMap.Polyline(data.points);
                 me.orderMarkers.push(line);
                 line.setStrokeOpacity(0.5);
                 line.setStrokeStyle("dashed");
                 me.bmap.addOverlay(line);
-                me.mapcenter = data.points[1];
-                console.log(me.mapcenter)
+                if (index === (recs.length - 1)) {
+                    console.log(index)
+                    me.bmap.panTo(data.points[1]);
+                }
+
             });
         });
 
-        me.bmap.panTo(me.mapcenter);
 
     },
 
@@ -123,7 +155,6 @@ Ext.define('Kits.view.BMap', {
                         me.riderMarkers = []
                     }
                     Ext.each(records, function (rec) {
-                        if (!Ext.Array.contains(me.riderFiler, rec.get('id')))return;
                         var lng = parseFloat(rec.get('lng')) / 1000000;
                         var lat = parseFloat(rec.get('lat')) / 1000000;
                         // lng += Ext.Number.randomInt(1, 10) / 1000.0;
@@ -142,13 +173,18 @@ Ext.define('Kits.view.BMap', {
                         marker.setZIndex(10);
                         me.bmap.addOverlay(marker);
                         marker.setLabel(label);
-                        var markerMenu = new BMap.ContextMenu();
-                        markerMenu.addItem(new BMap.MenuItem('指派',
-                            function () {
-                                console.log(riderId)
-                                me.asignToRider(riderId, displayName);
-                            }.bind(me)));
-                        marker.addContextMenu(markerMenu);
+                        // var markerMenu = new BMap.ContextMenu();
+                        // markerMenu.addItem(new BMap.MenuItem('指派',
+                        //     function () {
+                        //         console.log(riderId)
+                        //         me.asignToRider(riderId, displayName);
+                        //     }.bind(me)));
+                        // marker.addContextMenu(markerMenu);
+
+                        marker.addEventListener('rightclick', function () {
+                            me.asignToRider(riderId, displayName);
+                        }.bind(me));
+
 
                         marker.addEventListener("click", function () {
 

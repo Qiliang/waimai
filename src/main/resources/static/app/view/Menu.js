@@ -1,7 +1,7 @@
 Ext.define('Kits.view.Menu', {
     extend: 'Ext.list.Tree',
     rootVisible: false,
-    useArrows: true,
+    // useArrows: true,
     id: 'mainMenu',
     //ui:'nav',
     listeners: {

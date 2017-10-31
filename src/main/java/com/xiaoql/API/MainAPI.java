@@ -4,21 +4,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xiaoql.entity.*;
 import com.xiaoql.mapper.*;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -252,19 +248,38 @@ public class MainAPI {
     @GetMapping("/riders")
     public Object riders(Integer status) {
         RiderExample example = new RiderExample();
-        if (status == null) {
-            return riderExMapper.getAllWithShop();
-        }
-        else {
-            example.createCriteria().andStatusEqualTo(status);
-            List<Rider> riders = riderMapper.selectByExample(example);
+//        if (status == null) {
+//            return riderExMapper.getAllWithShop();
+//        }
+//        else {
+        List<Map<String, Object>> riderStatusList = shopOrderExMapper.groupByRiderStatus();
+        if (status != null) example.createCriteria().andStatusEqualTo(status);
+        List<RiderView> riders = riderMapper.selectByExample(example).stream().map(r -> {
+            RiderView view = new RiderView();
+            try {
+                BeanUtils.copyProperties(view, r);
+                riderStatusList.stream().filter(p -> p.get("rider_id").equals(r.getId())).collect(Collectors.toList()).forEach(count -> {
+                    if (count.get("status").equals(11)) {
+                        view.setDqcCount(((Long) count.get("count")).intValue());
+                    } else if (count.get("status").equals(12)) {
+                        view.setPszCount(((Long) count.get("count")).intValue());
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return view;
+        }).collect(Collectors.toList());
+
+
             riders.forEach(rider -> {
                 ShopOrderExample shopOrderExample = new ShopOrderExample();
                 shopOrderExample.createCriteria().andRiderIdEqualTo(rider.getId()).andStatusBetween(11, 12);
                 rider.setOrderCount((int) shopOrderMapper.countByExample(shopOrderExample));
             });
+
             return riders;
-        }
+//        }
     }
 
     @PutMapping("/riders/{id}")
@@ -324,7 +339,7 @@ public class MainAPI {
 
 //////////////////////////////////////订单相关/////////////////////////////////////////////////////////////////////
 
-    private final Map<String, List<String>> riderMap = new ConcurrentHashMap<>();
+//    private final Map<String, List<String>> riderMap = new ConcurrentHashMap<>();
 
 //    @GetMapping({"/orders"})
 //    public PageInfo<ShopOrder> orders(Integer status, Integer page, Integer size, String sort) {
@@ -334,49 +349,29 @@ public class MainAPI {
 //            createCriteria().andStatusEqualTo(status);
 //        }}));
 //    }
-
-    @Scheduled(initialDelay = 3000, fixedDelay = 1000 * 10)
-    public void getRider() {
-        List<Rider> riders = riderMapper.selectByExample(new RiderExample());
-        Map<String, List<String>> riderMap = riders.stream().filter(r -> StringUtils.isNotBlank(r.getShopId()))
-                .collect(Collectors.groupingBy(Rider::getShopId, Collectors.mapping(Rider::getId, Collectors.toList())));
-        riderMap.put("others", riders.stream().filter(r -> StringUtils.isBlank(r.getShopId())).map(Rider::getId).collect(Collectors.toList()));
-        this.riderMap.putAll(riderMap);
-    }
+//
+//    @Scheduled(initialDelay = 3000, fixedDelay = 1000 * 10)
+//    public void getRider() {
+//        List<Rider> riders = riderMapper.selectByExample(new RiderExample());
+//        Map<String, List<String>> riderMap = riders.stream().filter(r -> StringUtils.isNotBlank(r.getShopId()))
+//                .collect(Collectors.groupingBy(Rider::getShopId, Collectors.mapping(Rider::getId, Collectors.toList())));
+//        riderMap.put("others", riders.stream().filter(r -> StringUtils.isBlank(r.getShopId())).map(Rider::getId).collect(Collectors.toList()));
+//        this.riderMap.putAll(riderMap);
+//    }
 
 
     @GetMapping(value = {"/orders"})
-    public PageInfo<ShopOrder> orders(@RequestParam(required = false) Integer status) {
-        if (Status.OrderConfirm == status) {
-            PageHelper.startPage(1, 25);
-            List<ShopOrder> orders = shopOrderMapper.selectByExample(new ShopOrderExample() {{
-                setOrderByClause("time desc");
-                createCriteria().andStatusEqualTo(status);
-            }});
+    public PageInfo<ShopOrder> orders(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "25") int size,
+                                      @RequestParam(required = false) Integer status, @RequestParam(required = false) String orderIdFilter) {
+        PageHelper.startPage(page, size);
 
-            orders.forEach(order -> {
-                if (this.riderMap.containsKey(order.getShopId())) {
-                    order.setRiders(this.riderMap.get(order.getShopId()));
-                } else {
-                    order.setRiders(this.riderMap.get("others"));
-                }
-            });
+        List<ShopOrder> orders = shopOrderMapper.selectByExample(new ShopOrderExample() {{
+            setOrderByClause("time desc");
+            if (status != null) createCriteria().andStatusEqualTo(status);
+            if(StringUtils.isNotBlank(orderIdFilter))createCriteria().andIdLike("%"+orderIdFilter+"%");
+        }});
 
-            return new PageInfo(orders);
-
-        } else if (status == null) {
-            PageHelper.startPage(1, 25);
-            return new PageInfo(shopOrderMapper.selectByExample(new ShopOrderExample() {{
-                setOrderByClause("time desc");
-            }}));
-        } else {
-            PageHelper.startPage(1, 25);
-            return new PageInfo(shopOrderMapper.selectByExample(new ShopOrderExample() {{
-                setOrderByClause("time desc");
-                createCriteria().andStatusEqualTo(status);
-            }}));
-
-        }
+        return new PageInfo(orders);
     }
 
 //    @PutMapping({"/orders/{id}"})

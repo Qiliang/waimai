@@ -30,6 +30,7 @@
     <result column="rider_complete_lng" jdbcType="VARCHAR" property="riderCompleteLng" />
     <result column="rider_complete_lat" jdbcType="VARCHAR" property="riderCompleteLat" />
     <result column="rider_coast" jdbcType="INTEGER" property="riderCoast" />
+    <result column="day_seq" jdbcType="VARCHAR" property="daySeq" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -94,7 +95,7 @@
     recipient_phone, recipient_address, recipient_lng, recipient_lat, shipping_fee, total, 
     rider_id, rider_name, rider_phone, status, rider_assign_time, rider_read_time, rider_get_goods_time, 
     rider_get_goods_lng, rider_get_goods_lat, rider_complete_time, rider_complete_lng, 
-    rider_complete_lat, rider_coast
+    rider_complete_lat, rider_coast, day_seq
   </sql>
   <select id="selectByExample" parameterType="com.xiaoql.entity.ShopOrderExample" resultMap="BaseResultMap">
     select
@@ -136,8 +137,8 @@
       status, rider_assign_time, rider_read_time, 
       rider_get_goods_time, rider_get_goods_lng, 
       rider_get_goods_lat, rider_complete_time, 
-      rider_complete_lng, rider_complete_lat, rider_coast
-      )
+      rider_complete_lng, rider_complete_lat, rider_coast, 
+      day_seq)
     values (#{id,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, #{shopId,jdbcType=VARCHAR}, 
       #{shopPhone,jdbcType=VARCHAR}, #{shopName,jdbcType=VARCHAR}, #{shopAddress,jdbcType=VARCHAR}, 
       #{shopLng,jdbcType=VARCHAR}, #{shopLat,jdbcType=VARCHAR}, #{recipientName,jdbcType=VARCHAR}, 
@@ -147,8 +148,8 @@
       #{status,jdbcType=INTEGER}, #{riderAssignTime,jdbcType=TIMESTAMP}, #{riderReadTime,jdbcType=TIMESTAMP}, 
       #{riderGetGoodsTime,jdbcType=TIMESTAMP}, #{riderGetGoodsLng,jdbcType=VARCHAR}, 
       #{riderGetGoodsLat,jdbcType=VARCHAR}, #{riderCompleteTime,jdbcType=TIMESTAMP}, 
-      #{riderCompleteLng,jdbcType=VARCHAR}, #{riderCompleteLat,jdbcType=VARCHAR}, #{riderCoast,jdbcType=INTEGER}
-      )
+      #{riderCompleteLng,jdbcType=VARCHAR}, #{riderCompleteLat,jdbcType=VARCHAR}, #{riderCoast,jdbcType=INTEGER}, 
+      #{daySeq,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.xiaoql.entity.ShopOrder">
     insert into shop_order
@@ -237,6 +238,9 @@
       <if test="riderCoast != null">
         rider_coast,
       </if>
+      <if test="daySeq != null">
+        day_seq,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -322,6 +326,9 @@
       </if>
       <if test="riderCoast != null">
         #{riderCoast,jdbcType=INTEGER},
+      </if>
+      <if test="daySeq != null">
+        #{daySeq,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -418,6 +425,9 @@
       <if test="record.riderCoast != null">
         rider_coast = #{record.riderCoast,jdbcType=INTEGER},
       </if>
+      <if test="record.daySeq != null">
+        day_seq = #{record.daySeq,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -452,7 +462,8 @@
       rider_complete_time = #{record.riderCompleteTime,jdbcType=TIMESTAMP},
       rider_complete_lng = #{record.riderCompleteLng,jdbcType=VARCHAR},
       rider_complete_lat = #{record.riderCompleteLat,jdbcType=VARCHAR},
-      rider_coast = #{record.riderCoast,jdbcType=INTEGER}
+      rider_coast = #{record.riderCoast,jdbcType=INTEGER},
+      day_seq = #{record.daySeq,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -541,6 +552,9 @@
       <if test="riderCoast != null">
         rider_coast = #{riderCoast,jdbcType=INTEGER},
       </if>
+      <if test="daySeq != null">
+        day_seq = #{daySeq,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -572,7 +586,8 @@
       rider_complete_time = #{riderCompleteTime,jdbcType=TIMESTAMP},
       rider_complete_lng = #{riderCompleteLng,jdbcType=VARCHAR},
       rider_complete_lat = #{riderCompleteLat,jdbcType=VARCHAR},
-      rider_coast = #{riderCoast,jdbcType=INTEGER}
+      rider_coast = #{riderCoast,jdbcType=INTEGER},
+      day_seq = #{daySeq,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

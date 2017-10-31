@@ -75,14 +75,13 @@ public class MeituanAPI {
         shopOrder.setRecipientLng(StringUtils.rightPad(valueMap.get("longitude").toString().replace(".", ""), 9, '0'));
         shopOrder.setRecipientLat(StringUtils.rightPad(valueMap.get("latitude").toString().replace(".", ""), 8, '0'));
 
-
-
         shopOrder.setShopLng(shop.getLng());
         shopOrder.setShopLat(shop.getLat());
         shopOrder.setTotal(Double.parseDouble(valueMap.get("total").toString()));
         shopOrder.setShopPhone(valueMap.valString("poiPhone"));
         shopOrder.setShopAddress(valueMap.valString("poiAddress"));
         shopOrder.setShippingFee(shop.getShippingFee());
+        shopOrder.setDaySeq(valueMap.valString("daySeq"));
         shopOrderMapper.insertSelective(shopOrder);
         return OK;
         //String s = "{\"avgSendTime\":2400.0,\"caution\":\"\",\"cityId\":420500,\"ctime\":1506586628,\"daySeq\":\"21\",\"deliveryTime\":0,\"detail\":\"[{\\\"app_food_code\\\":\\\"?????+?????\\\",\\\"box_num\\\":1,\\\"box_price\\\":0,\\\"cart_id\\\":0,\\\"food_discount\\\":1,\\\"food_name\\\":\\\"?????+?????\\\",\\\"food_property\\\":\\\"??,?\\\",\\\"price\\\":20,\\\"quantity\\\":1,\\\"sku_id\\\":\\\"\\\",\\\"spec\\\":\\\"\\\",\\\"unit\\\":\\\"?\\\"}]\",\"dinnersNumber\":0,\"ePoiId\":\"bc52f284-ea25-4556-bd36-43d2a5b1219b\",\"extras\":\"[{}]\",\"hasInvoiced\":0,\"invoiceTitle\":\"\",\"isFavorites\":false,\"isPoiFirstOrder\":false,\"isThirdShipping\":0,\"latitude\":30.701898,\"logisticsCode\":\"2002\",\"longitude\":111.279216,\"orderId\":6292920071,\"orderIdView\":24396521203884554,\"originalPrice\":22.0,\"payType\":2,\"poiAddress\":\"??????26?\",\"poiFirstOrder\":false,\"poiId\":2439652,\"poiName\":\"?????????????\",\"poiPhone\":\"17371724087\",\"poiReceiveDetail\":\"{\\\"actOrderChargeByMt\\\":[],\\\"actOrderChargeByMtIterator\\\":{},\\\"actOrderChargeByMtSize\\\":0,\\\"actOrderChargeByPoi\\\":[],\\\"actOrderChargeByPoiIterator\\\":{\\\"$ref\\\":\\\"$.actOrderChargeByMtIterator\\\"},\\\"actOrderChargeByPoiSize\\\":0,\\\"foodShareFeeChargeByPoi\\\":300,\\\"logisticsFee\\\":200,\\\"onlinePayment\\\":2200,\\\"setActOrderChargeByMt\\\":true,\\\"setActOrderChargeByPoi\\\":true,\\\"setFoodShareFeeChargeByPoi\\\":true,\\\"setLogisticsFee\\\":true,\\\"setOnlinePayment\\\":true,\\\"setWmPoiReceiveCent\\\":true,\\\"wmPoiReceiveCent\\\":1700}\",\"recipientAddress\":\"?????? (B?1203?)@#?????????????????8???????\",\"recipientName\":\"??(??)\",\"recipientPhone\":\"15549319591\",\"shipperPhone\":\"\",\"shippingFee\":2.0,\"status\":2,\"taxpayerId\":\"\",\"total\":22.0,\"utime\":1506586628}";
@@ -160,7 +159,8 @@ public class MeituanAPI {
 
     //订单配送状态的回调URL
     @RequestMapping("/order_state")
-    public String order_state(HttpServletRequest request) throws IOException {
+    public String order_state(String ePoiId, String shippingStatus, HttpServletRequest request) throws IOException {
+        //Map<String, Object> valueMap = objectMapper.readValue(shippingStatus, Map.class);
         System.out.println("order_state");
         
         return OK;

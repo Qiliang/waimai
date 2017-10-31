@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
 
@@ -26,37 +25,47 @@ public class AppPush {
 
     public void pushToRider(String clientId) {
         try {
+            if (authToken == null)
+                authToken();
+
             OkHttpClient client = new OkHttpClient();
-            RequestBody body = RequestBody.create(JSON,
-                    "{\n" +
-                            "     \"message\": {\n" +
-                            "       \"appkey\": \"" + appKey + "\",\n" +
-                            "       \"is_offline\": true,\n" +
-                            "       \"offline_expire_time\":10000000,\n" +
-                            "       \"msgtype\": \"notification\"\n" +
-                            "    },\n" +
-                            "    \"notification\": {\n" +
-                            "        \"style\": {\n" +
-                            "            \"type\": 0,\n" +
-                            "            \"text\": \"text\",\n" +
-                            "            \"title\": \"tttt\"\n" +
-                            "        },\n" +
-                            "        \"transmission_type\": true,\n" +
-                            "        \"transmission_content\": \"透传内容\"\n" +
-                            "    },\n" +
-                            "    \"cid\": \"" + clientId + "\",\n" +
-                            "    \"requestid\": \"" + UUID.randomUUID().toString().replace("-", "") + "\"\n" +
-                            "}");
+
+            String post_body = "{\n" +
+                    "     \"message\": {\n" +
+                    "       \"appkey\": \"" + appKey + "\",\n" +
+                    "       \"is_offline\": true,\n" +
+                    "       \"offline_expire_time\":10000000,\n" +
+                    "       \"msgtype\": \"notification\"\n" +
+                    "    },\n" +
+                    "    \"notification\": {\n" +
+                    "        \"style\": {\n" +
+                    "            \"type\": 0,\n" +
+                    "            \"text\": \"text\",\n" +
+                    "            \"title\": \"tttt\"\n" +
+                    "        },\n" +
+                    "        \"transmission_type\": true,\n" +
+                    "        \"transmission_content\": \"透传内容\"\n" +
+                    "    },\n" +
+                    "    \"cid\": \"" + clientId + "\",\n" +
+                    "    \"requestid\": \"" + new Sequence(1, 1).nextId() + "\"\n" +
+                    "}";
+
+            RequestBody body = RequestBody.create(JSON, post_body);
             Request request = new Request.Builder()
                     .url(" https://restapi.getui.com/v1/" + appId + "/push_single")
                     .header("authtoken", authToken)
                     .post(body)
                     .build();
             Response response = client.newCall(request).execute();
+
+            String s = response.body().string();
+            System.out.println(s);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Scheduled(initialDelay = 5 * 1000, fixedDelay = 10 * 60 * 1000)
     public void authToken() {
@@ -79,10 +88,16 @@ public class AppPush {
             Map<String, Object> res = objectMapper.readValue(s, Map.class);
             if ("ok".equals(res.get("result")))
                 authToken = res.get("auth_token").toString();
-            authToken = "error";
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    @Scheduled(initialDelay = 10 * 1000, fixedDelay = 1000)
+    public void authTokenNull() {
+        if (authToken != null) return;
+        authToken();
     }
 
 }

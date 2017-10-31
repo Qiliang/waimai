@@ -28,6 +28,7 @@ Ext.define('Kits.model.Order', {
         {name: 'riderCompleteTime', type: 'date', dateFormat: 'time'},
         'riderCompleteLng',
         'riderCompleteLat',
+        'daySeq',
         {name: 'riderCoast', type: 'float'},
         {
             name: 'riderDisplayName', type: 'string', persist: false,

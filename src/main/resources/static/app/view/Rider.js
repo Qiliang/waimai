@@ -75,22 +75,22 @@ Ext.define('Kits.view.Rider', {
                 allowBlank: false
             }
         },
-        {
-            flex:1,
-            text: '专送商家',
-            dataIndex: 'shopId',
-            renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                return record.get('shopName');
-            },
-            editor: {
-                allowBlank: true,
-                xtype:'combo',
-                store: Ext.create('Kits.store.Shop'),
-                forceSelection:true,
-                displayField: 'name',
-                valueField: 'id'
-            }
-        },
+        // {
+        //     flex:1,
+        //     text: '专送商家',
+        //     dataIndex: 'shopId',
+        //     renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+        //         return record.get('shopName');
+        //     },
+        //     editor: {
+        //         allowBlank: true,
+        //         xtype:'combo',
+        //         store: Ext.create('Kits.store.Shop'),
+        //         forceSelection:true,
+        //         displayField: 'name',
+        //         valueField: 'id'
+        //     }
+        // },
         {
             flex:1,
             text: '状态',
