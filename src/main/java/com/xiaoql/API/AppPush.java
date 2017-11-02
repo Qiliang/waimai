@@ -7,6 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -30,25 +32,46 @@ public class AppPush {
 
             OkHttpClient client = new OkHttpClient();
 
+//            String post_body = "{\n" +
+//                    "     \"message\": {\n" +
+//                    "       \"appkey\": \"" + appKey + "\",\n" +
+//                    "       \"is_offline\": true,\n" +
+//                    "       \"offline_expire_time\":10000000,\n" +
+//                    "       \"msgtype\": \"notification\"\n" +
+//                    "    },\n" +
+//                    "    \"notification\": {\n" +
+//                    "        \"style\": {\n" +
+//                    "            \"type\": 0,\n" +
+//                    "            \"text\": \"您有新订单了\",\n" +
+//                    "            \"title\": \"订单提醒\"\n" +
+//                    "        },\n" +
+//                    "        \"transmission_type\": true,\n" +
+//                    "        \"transmission_content\": \"透传内容\"\n" +
+//                    "    },\n" +
+//                    "    \"cid\": \"" + clientId + "\",\n" +
+//                    "    \"requestid\": \"" + new Sequence(1, 1).nextId() + "\"\n" +
+//                    "}";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String begin = sdf.format(new Date());
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            String end = sdf.format(calendar.getTime());
             String post_body = "{\n" +
-                    "     \"message\": {\n" +
-                    "       \"appkey\": \"" + appKey + "\",\n" +
-                    "       \"is_offline\": true,\n" +
-                    "       \"offline_expire_time\":10000000,\n" +
-                    "       \"msgtype\": \"notification\"\n" +
-                    "    },\n" +
-                    "    \"notification\": {\n" +
-                    "        \"style\": {\n" +
-                    "            \"type\": 0,\n" +
-                    "            \"text\": \"text\",\n" +
-                    "            \"title\": \"tttt\"\n" +
+                    "        \"message\":{\n" +
+                    "            \"appkey\":\"" + appKey + "\",\n" +
+                    "            \"is_offline\":false,\n" +
+                    "            \"msgtype\":\"transmission\"\n" +
                     "        },\n" +
-                    "        \"transmission_type\": true,\n" +
-                    "        \"transmission_content\": \"透传内容\"\n" +
-                    "    },\n" +
-                    "    \"cid\": \"" + clientId + "\",\n" +
-                    "    \"requestid\": \"" + new Sequence(1, 1).nextId() + "\"\n" +
-                    "}";
+                    "        \"transmission\":{\n" +
+                    "            \"transmission_type\":false,\n" +
+                    "            \"transmission_content\":\"您有新订单了\",\n" +
+                    "            \"duration_begin\":\"" + begin + "\",\n" +
+                    "            \"duration_end\":\"" + end + "\"\n" +
+                    "        },\n" +
+                    "        \"cid\":\"" + clientId + "\",\n" +
+                    "        \"requestid\":\"" + new Sequence(1, 1).nextId() + "\"\n" +
+                    "     }";
 
             RequestBody body = RequestBody.create(JSON, post_body);
             Request request = new Request.Builder()

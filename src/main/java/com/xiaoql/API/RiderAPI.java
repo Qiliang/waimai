@@ -235,7 +235,7 @@ public class RiderAPI {
      * 骑手新订单提醒
      */
     @PostMapping("/orders/alert")
-    public Object alert(@RequestParam String token, @RequestParam String time, HttpServletResponse response) throws ParseException {
+    public Object alert(@RequestParam String token, HttpServletResponse response) throws ParseException {
         Rider rider = riderMapper.selectByPrimaryKey(token);
         if (rider == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -244,7 +244,7 @@ public class RiderAPI {
 
         ShopOrderExample example = new ShopOrderExample();
         example.createCriteria().andRiderIdEqualTo(token).andStatusEqualTo(Status.OrderRiderAssgin)
-                .andRiderAssignTimeGreaterThan(Utils.toDate(time)).andRiderReadTimeIsNotNull();
+              .andRiderReadTimeIsNull();
         PageHelper.startPage(1, 1, false);
         List list = shopOrderMapper.selectByExample(example);
         Map<String, Object> map = new HashMap<>();
