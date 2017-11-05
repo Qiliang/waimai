@@ -61,6 +61,8 @@ public class ShopOrder {
 
     private String daySeq;
 
+    private Integer type;
+
     public String getId() {
         return id;
     }
@@ -291,5 +293,13 @@ public class ShopOrder {
 
     public void setDaySeq(String daySeq) {
         this.daySeq = daySeq == null ? null : daySeq.trim();
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

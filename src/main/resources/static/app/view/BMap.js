@@ -114,6 +114,9 @@ Ext.define('Kits.view.BMap', {
 
                 var line = new BMap.Polyline(data.points);
                 me.orderMarkers.push(line);
+                console.log(line.getStrokeColor())
+                if (rec.get('status') === 12) line.setStrokeColor('#3a6bdb');//'[已取]'
+                if (rec.get('status') === 11)line.setStrokeColor('#dd7e6b');//'[未取]'
                 line.setStrokeOpacity(0.5);
                 line.setStrokeStyle("dashed");
                 me.bmap.addOverlay(line);

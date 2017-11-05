@@ -47,7 +47,7 @@ Ext.define('Kits.view.schedule.Dzp', {
                     variableRowHeight: true,
                     renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
                         var recipientAddress = record.get('recipientAddress').split('@#')[0];
-                        return '<div style="padding: 5px;">#'+record.get('daySeq') +'</div>'+
+                        return '<div style="padding: 5px;"><span>#'+record.get('daySeq') +'</span><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span>'+Ext.Date.format(record.get('time'),'Y-m-d H:i:s') +'</span></div>'+
                         '<div style="padding: 5px;"><span style="color:#4c82b1" class="fa fa-arrow-circle-left"></span>' + record.get('shopName') + '</div>'
                             + '<div style="padding: 5px;"><span style="color:saddlebrown" class="fa fa-arrow-circle-right"></span><span>' + recipientAddress + '</span></div>'
                     }
@@ -73,7 +73,9 @@ Ext.define('Kits.view.schedule.Dzp', {
             xtype: 'bmap',
             asignToRider: function (riderId, displayName) {
                 var me = this.up('dzp');
-                me.asignToRider(riderId, displayName);
+                me.asignToRider(riderId, displayName,function(){
+                    me.queryById('riderGird').getStore().reload();
+                });
             },
             reasignToRider: function (riderId, displayName, orderId, callback) {
                 var me = this.up('dzp');
@@ -117,7 +119,9 @@ Ext.define('Kits.view.schedule.Dzp', {
                     e.preventDefault();
                     if (record.get('status') !== 1)return;
                     var me = grid.up('dzp');
-                    me.asignToRider(record.get('id'), record.get('displayName'));
+                    me.asignToRider(record.get('id'), record.get('displayName'),function () {
+                        me.queryById('riderGird').getStore().reload();
+                    });
 
                 },
                 rowdblclick: function (grid, record, element, rowIndex, e, eOpts) {
@@ -170,7 +174,7 @@ Ext.define('Kits.view.schedule.Dzp', {
     },
 
 
-    asignToRider: function (riderId, displayName) {
+    asignToRider: function (riderId, displayName,callback) {
         var me = this;
         var grid = me.down('grid[itemId=shopOrderGrid]');
         if (!grid.getSelection() || grid.getSelection().length == 0)return;
@@ -187,7 +191,7 @@ Ext.define('Kits.view.schedule.Dzp', {
                         scope: this,
                         callback: function (records, operation, success) {
                             grid.setSelection(records[0])
-                            console.log(records);
+                            if(callback)callback();
                         }
                     });
                 },

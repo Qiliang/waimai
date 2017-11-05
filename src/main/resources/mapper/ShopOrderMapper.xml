@@ -31,6 +31,7 @@
     <result column="rider_complete_lat" jdbcType="VARCHAR" property="riderCompleteLat" />
     <result column="rider_coast" jdbcType="INTEGER" property="riderCoast" />
     <result column="day_seq" jdbcType="VARCHAR" property="daySeq" />
+    <result column="type" jdbcType="INTEGER" property="type" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -95,7 +96,7 @@
     recipient_phone, recipient_address, recipient_lng, recipient_lat, shipping_fee, total, 
     rider_id, rider_name, rider_phone, status, rider_assign_time, rider_read_time, rider_get_goods_time, 
     rider_get_goods_lng, rider_get_goods_lat, rider_complete_time, rider_complete_lng, 
-    rider_complete_lat, rider_coast, day_seq
+    rider_complete_lat, rider_coast, day_seq, type
   </sql>
   <select id="selectByExample" parameterType="com.xiaoql.entity.ShopOrderExample" resultMap="BaseResultMap">
     select
@@ -138,7 +139,7 @@
       rider_get_goods_time, rider_get_goods_lng, 
       rider_get_goods_lat, rider_complete_time, 
       rider_complete_lng, rider_complete_lat, rider_coast, 
-      day_seq)
+      day_seq, type)
     values (#{id,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, #{shopId,jdbcType=VARCHAR}, 
       #{shopPhone,jdbcType=VARCHAR}, #{shopName,jdbcType=VARCHAR}, #{shopAddress,jdbcType=VARCHAR}, 
       #{shopLng,jdbcType=VARCHAR}, #{shopLat,jdbcType=VARCHAR}, #{recipientName,jdbcType=VARCHAR}, 
@@ -149,7 +150,7 @@
       #{riderGetGoodsTime,jdbcType=TIMESTAMP}, #{riderGetGoodsLng,jdbcType=VARCHAR}, 
       #{riderGetGoodsLat,jdbcType=VARCHAR}, #{riderCompleteTime,jdbcType=TIMESTAMP}, 
       #{riderCompleteLng,jdbcType=VARCHAR}, #{riderCompleteLat,jdbcType=VARCHAR}, #{riderCoast,jdbcType=INTEGER}, 
-      #{daySeq,jdbcType=VARCHAR})
+      #{daySeq,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.xiaoql.entity.ShopOrder">
     insert into shop_order
@@ -241,6 +242,9 @@
       <if test="daySeq != null">
         day_seq,
       </if>
+      <if test="type != null">
+        type,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -329,6 +333,9 @@
       </if>
       <if test="daySeq != null">
         #{daySeq,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -428,6 +435,9 @@
       <if test="record.daySeq != null">
         day_seq = #{record.daySeq,jdbcType=VARCHAR},
       </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -463,7 +473,8 @@
       rider_complete_lng = #{record.riderCompleteLng,jdbcType=VARCHAR},
       rider_complete_lat = #{record.riderCompleteLat,jdbcType=VARCHAR},
       rider_coast = #{record.riderCoast,jdbcType=INTEGER},
-      day_seq = #{record.daySeq,jdbcType=VARCHAR}
+      day_seq = #{record.daySeq,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -555,6 +566,9 @@
       <if test="daySeq != null">
         day_seq = #{daySeq,jdbcType=VARCHAR},
       </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -587,7 +601,8 @@
       rider_complete_lng = #{riderCompleteLng,jdbcType=VARCHAR},
       rider_complete_lat = #{riderCompleteLat,jdbcType=VARCHAR},
       rider_coast = #{riderCoast,jdbcType=INTEGER},
-      day_seq = #{daySeq,jdbcType=VARCHAR}
+      day_seq = #{daySeq,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>
