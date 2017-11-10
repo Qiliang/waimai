@@ -48,7 +48,6 @@ public class MeituanAPI {
     @RequestMapping("/live")
     public String live(HttpServletRequest request) throws IOException {
         System.out.println("live");
-        
         return OK;
     }
 
@@ -288,7 +287,8 @@ public class MeituanAPI {
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         String json = objectMapper.writeValueAsString(data);
         params.put("data", json);
-        post("http://heartbeat.meituan.com/pos/heartbeat", params, false);
+        String result = post("http://heartbeat.meituan.com/pos/heartbeat", params, false);
+        System.out.println(result);
     }
 
 
@@ -366,22 +366,22 @@ public class MeituanAPI {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-//        String[] ids = TimeZone.getAvailableIDs();
-//        for (String id : ids)
-//            System.out.println(id);
-        int d = 1507528467;
-        //TimeZone tz = TimeZone.getTimeZone("Etc/GMT+0");
-        TimeZone tz = TimeZone.getDefault();
-        System.out.println(tz.getRawOffset());
-        System.out.println((d * 1000L));
-        System.out.println(tz.getOffset(1507528467));
-//Etc/GMT+0
-        Date orderTime = new Date();
-        orderTime.setTime(d * 1000);
-
-        System.out.println(orderTime);
-        orderTime.setTime(d * 1000L);
-        System.out.println(orderTime);
-    }
+//    public static void main(String[] args) throws IOException {
+////        String[] ids = TimeZone.getAvailableIDs();
+////        for (String id : ids)
+////            System.out.println(id);
+//        int d = 1507528467;
+//        //TimeZone tz = TimeZone.getTimeZone("Etc/GMT+0");
+//        TimeZone tz = TimeZone.getDefault();
+//        System.out.println(tz.getRawOffset());
+//        System.out.println((d * 1000L));
+//        System.out.println(tz.getOffset(1507528467));
+////Etc/GMT+0
+//        Date orderTime = new Date();
+//        orderTime.setTime(d * 1000);
+//
+//        System.out.println(orderTime);
+//        orderTime.setTime(d * 1000L);
+//        System.out.println(orderTime);
+//    }
 }

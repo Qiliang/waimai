@@ -2,6 +2,8 @@ package com.xiaoql;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -13,7 +15,9 @@ import java.util.concurrent.Executors;
 
 @SpringBootApplication
 @EnableScheduling
-public class WaimaiApplication extends WebMvcConfigurerAdapter {
+
+public class WaimaiApplication extends SpringBootServletInitializer {
+//public class WaimaiApplication extends WebMvcConfigurerAdapter {
 
 	public static void main(String[] args) {
 		System.setProperty("user.timezone","Asia/Shanghai");
@@ -28,6 +32,11 @@ public class WaimaiApplication extends WebMvcConfigurerAdapter {
 		System.out.println("user.country：" + System.getProperty("user.country"));
 		System.out.println("默认时区：" + TimeZone.getDefault().getID());
 		SpringApplication.run(WaimaiApplication.class, args);
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(WaimaiApplication.class);
 	}
 
 	@Bean
