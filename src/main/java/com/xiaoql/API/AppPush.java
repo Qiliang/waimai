@@ -18,9 +18,9 @@ import static org.apache.commons.codec.digest.DigestUtils.getSha256Digest;
 public class AppPush {
 
     //定义常量, appId、appKey、masterSecret 采用本文档 "第二步 获取访问凭证 "中获得的应用配置
-    private static String appId = "qMUnwfAaj566iFOBczXuwA";
-    private static String appKey = "wsopJK8JAJ91QkLotr2N7A";
-    private static String masterSecret = "YPK5L4bDWj9ahR1Z48Mrd";
+    private static String appId = "y3vvcHUf4e8FIWwYo9ELJ";
+    private static String appKey = "RAWT38KSni7WS9cjGyaSKA";
+    private static String masterSecret = "Zl2MFWTdCQ8jZqRNgnJpV9";
     private static String url = "http://sdk.open.api.igexin.com/apiex.htm";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private String authToken = null;
