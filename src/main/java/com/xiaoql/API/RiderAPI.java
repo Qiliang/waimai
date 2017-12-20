@@ -2,11 +2,9 @@ package com.xiaoql.API;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.xiaoql.entity.Rider;
-import com.xiaoql.entity.RiderExample;
-import com.xiaoql.entity.ShopOrder;
-import com.xiaoql.entity.ShopOrderExample;
+import com.xiaoql.entity.*;
 import com.xiaoql.mapper.RiderMapper;
+import com.xiaoql.mapper.ShopMapper;
 import com.xiaoql.mapper.ShopOrderExMapper;
 import com.xiaoql.mapper.ShopOrderMapper;
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -34,11 +32,15 @@ public class RiderAPI {
 
     @Autowired
     private RiderMapper riderMapper;
-
+    @Autowired
+    private ShopMapper shopMapper;
     @Autowired
     private ShopOrderMapper shopOrderMapper;
     @Autowired
-    private ShopOrderExMapper  shopOrderExMapper;
+    private ShopOrderExMapper shopOrderExMapper;
+
+    @Autowired
+    private MeituanAPI meituanAPI;
 
     private String token(String username) {
         Md5Crypt.apr1Crypt(username);
@@ -118,7 +120,7 @@ public class RiderAPI {
             return new RestResponse(true, "骑手未登录");
         }
 
-        riderMapper.updateByPrimaryKeySelective(new Rider(){{
+        riderMapper.updateByPrimaryKeySelective(new Rider() {{
             setId(token);
             setLat(lat);
             setLng(lng);
@@ -175,7 +177,7 @@ public class RiderAPI {
             return new RestResponse(true, "骑手未登录");
         }
 
-        shopOrderExMapper.batchReadUpdate(new Date(),orderId);
+        shopOrderExMapper.batchReadUpdate(new Date(), orderId);
 //        ShopOrder shopOrder = shopOrderMapper.selectByPrimaryKey(orderId);
 //        shopOrder.setRiderReadTime(new Date());
 //        shopOrderMapper.updateByPrimaryKey(shopOrder);
@@ -217,6 +219,10 @@ public class RiderAPI {
 
         Date now = new Date();
         ShopOrder shopOrder = shopOrderMapper.selectByPrimaryKey(orderId);
+        Shop shop = shopMapper.selectByPrimaryKey(shopOrder.getShopId());
+        if (shop == null) {
+            return new RestResponse(true, "订单对应的店铺不存在！");
+        }
         shopOrder.setStatus(Status.OrderCompleted);
         shopOrder.setRiderCompleteTime(now);
         shopOrder.setRiderCompleteLng(lng);
@@ -228,6 +234,7 @@ public class RiderAPI {
 
         shopOrder.setRiderCoast((int) ((now.getTime() - shopOrder.getRiderAssignTime().getTime()) / 1000));
         shopOrderMapper.updateByPrimaryKey(shopOrder);
+        meituanAPI.orderDelivered(shop, orderId);
         return new RestResponse();
     }
 
@@ -244,7 +251,7 @@ public class RiderAPI {
 
         ShopOrderExample example = new ShopOrderExample();
         example.createCriteria().andRiderIdEqualTo(token).andStatusEqualTo(Status.OrderRiderAssgin)
-              .andRiderReadTimeIsNull();
+                .andRiderReadTimeIsNull();
         PageHelper.startPage(1, 1, false);
         List list = shopOrderMapper.selectByExample(example);
         Map<String, Object> map = new HashMap<>();

@@ -293,7 +293,7 @@ public class MeituanAPI {
 
 
     //自配送－配送状态
-    private boolean orderDelivering(Shop shop, String orderId, String courierName, String courierPhone) {
+    public boolean orderDelivering(Shop shop, String orderId, String courierName, String courierPhone) {
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         params.put("appAuthToken", shop.getMeituanToken());
         params.put("charset", "UTF-8");
@@ -304,7 +304,7 @@ public class MeituanAPI {
     }
 
     //自配送场景－订单已送达
-    private boolean orderDelivered(Shop shop, String orderId) {
+    public boolean orderDelivered(Shop shop, String orderId) {
         LinkedHashMap<String, Object> params = new LinkedHashMap<>();
         params.put("appAuthToken", shop.getMeituanToken());
         params.put("charset", "UTF-8");
